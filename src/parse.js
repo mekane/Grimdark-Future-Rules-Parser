@@ -90,7 +90,7 @@ function parseGroup(stringToParse) {
  * ([,\w \(\)]*)\) - just captures all of the potential rules text, to be parsed later
  *  \+(\d{1,3})pts - captures the number part of the points
  */
-const weaponSpec = /([\w-]+ ?[\w-]+ ?[\w-]+) \((?:(\d{1,2})(?:"|”), )?A(\d{1,2})([,\w \(\)]*)\) \+(\d{1,3})pts$/;
+const weaponSpec = /([\w- ]+) \((?:(\d{1,2})(?:"|”), )?A(\d{1,2})([,\w \(\)]*)\) \+(\d{1,3})pts$/;
 
 function parseUpgrade(stringToParse) {
     const pattern = stringToParse.match(weaponSpec);
