@@ -302,6 +302,19 @@ describe('Parsing the upgrade lines', () => {
             };
             expect(parser.parseUpgrade(string)).to.deep.equal(expected);
         });
+
+        it('parses a weapon rule with parentheses', () => {
+            const string = `Fusion Pistol (12”, A1, AP(2)) +5pts`;
+            let expected = {
+                name: 'Fusion Pistol',
+                range: 12,
+                attacks: 1,
+                rules: ['AP(2)'],
+                cost: 5
+            };
+            expect(parser.parseUpgrade(string)).to.deep.equal(expected);
+        });
+
     });
 
     describe('Detecting rules', () => {

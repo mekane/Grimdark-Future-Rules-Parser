@@ -92,7 +92,7 @@ function parseGroup(stringToParse) {
  * A(\d{1,2}) - captures a one or two digit number of attacks
  *  \+(\d{1,3})pts - captures the number part of the points
  */
-const weaponRegex = /(\w+ ?\w+) \((?:(\d{1,2})(?:"|”), )?A(\d{1,2})(?:, (\w+))?\) \+(\d{1,3})pts$/;
+const weaponRegex = /(\w+ ?\w+) \((?:(\d{1,2})(?:"|”), )?A(\d{1,2})(?:, ([\w\(\)]+))?\) \+(\d{1,3})pts$/;
 
 function parseUpgrade(stringToParse) {
     const pattern = stringToParse.match(weaponRegex);
