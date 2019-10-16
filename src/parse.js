@@ -96,6 +96,9 @@ function parseUpgrade(stringToParse) {
     const pattern = stringToParse.match(weaponSpec);
     //console.log(pattern);
 
+    if (pattern == null)
+        return parseNonWeaponUpgrade(stringToParse);
+
     const range = parseInt(pattern[2], 10);
 
     return {
@@ -112,6 +115,20 @@ function parseRules(stringToParse) {
         return [];
 
     return stringToParse.trim().replace(/,/g, '').split(' ').filter(s => s.length);
+}
+
+function parseNonWeaponUpgrade(stringToParse) {
+    const pattern = stringToParse.match(/([\w- ]+) (?:\(([\w-\+, \(\)]+)\))? ?\+(\d{1,3})pts$/);
+
+    let rules = [];
+    if (pattern[2] && pattern[2].length)
+        rules = pattern[2].split(',').map(s => s.trim()).filter(s => s.length);
+
+    return {
+        name: pattern[1],
+        rules: rules,
+        cost: parseInt(pattern[3], 10)
+    };
 }
 
 module.exports = {

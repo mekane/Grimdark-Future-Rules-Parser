@@ -352,4 +352,49 @@ describe('Parsing the upgrade lines', () => {
         });
     });
 
+    describe(`Detecting rules that don't match a weapon spec`, () => {
+        it(`assumes a rule name (or text) and a point cost`, () => {
+            const string = `Transport Spore +20pts`;
+            const expected = {
+                name: 'Transport Spore',
+                rules: [],
+                cost: 20
+            };
+
+            expect(parser.parseUpgrade(string)).to.deep.equal(expected);
+        });
+
+        it(`parses a rule name from parentheses`, () => {
+            const string = `Adrenaline (Furious) +5pts`;
+            const expected = {
+                name: 'Adrenaline',
+                rules: ['Furious'],
+                cost: 5
+            };
+
+            expect(parser.parseUpgrade(string)).to.deep.equal(expected);
+        });
+
+        it(`parses other text a rule text (including parens) from parentheses`, () => {
+            const string = `Acid Bite (AP(+1) in melee) +5pts`;
+            const expected = {
+                name: 'Acid Bite',
+                rules: ['AP(+1) in melee'],
+                cost: 5
+            };
+
+            expect(parser.parseUpgrade(string)).to.deep.equal(expected);
+        });
+
+        it(`parses multiple rules from parentheses`, () => {
+            const string = `Destroyer Armor (Ambush, Tough(+3)) +70pts`;
+            const expected = {
+                name: 'Destroyer Armor',
+                rules: ['Ambush', 'Tough(+3)'],
+                cost: 70
+            };
+
+            expect(parser.parseUpgrade(string)).to.deep.equal(expected);
+        });
+    });
 });
