@@ -78,9 +78,6 @@ function parseGroup(stringToParse) {
 }
 
 
-//TODO: make range optional or make a separate melee pattern
-//const weaponRegex = /(\w+ ?\w+) \(\d{1,2}", A(\d{1,2})(?:, [\w\(\)]+)*\) \+(\d+)pts$/;
-
 /**
  * (\w+ ?\w+) - capturing group for a one-or-two-word name (optional space)
  *
@@ -90,34 +87,31 @@ function parseGroup(stringToParse) {
  * ** All of the above is wrapped in a non-capturing group to make range optional
  *
  * A(\d{1,2}) - captures a one or two digit number of attacks
+ * ([,\w \(\)]*)\) - just captures all of the potential rules text, to be parsed later
  *  \+(\d{1,3})pts - captures the number part of the points
  */
-const weaponRegex = /(\w+ ?\w+) \((?:(\d{1,2})(?:"|”), )?A(\d{1,2})(?:, ([\w\(\)]+))?\) \+(\d{1,3})pts$/;
+const weaponSpec = /(\w+ ?\w+) \((?:(\d{1,2})(?:"|”), )?A(\d{1,2})([,\w \(\)]*)\) \+(\d{1,3})pts$/;
 
 function parseUpgrade(stringToParse) {
-    const pattern = stringToParse.match(weaponRegex);
-    console.log(pattern);
+    const pattern = stringToParse.match(weaponSpec);
+    //console.log(pattern);
 
-    const name = pattern[1];
     const range = parseInt(pattern[2], 10);
-    const rules = parseRules(pattern[4]);
 
     return {
-        name,
+        name: pattern[1],
         range: isNaN(range) ? 'melee' : range,
         attacks: parseInt(pattern[3], 10),
-        rules,
+        rules: parseRules(pattern[4]),
         cost: parseInt(pattern[5], 10)
     };
 }
 
 function parseRules(stringToParse) {
-    console.log('  parse rules: ' + stringToParse);
-
-    if (typeof stringToParse === 'undefined')
+    if (typeof stringToParse === 'undefined' || stringToParse == '')
         return [];
 
-    return [stringToParse];
+    return stringToParse.trim().replace(/,/g, '').split(' ').filter(s => s.length);
 }
 
 module.exports = {

@@ -315,6 +315,30 @@ describe('Parsing the upgrade lines', () => {
             expect(parser.parseUpgrade(string)).to.deep.equal(expected);
         });
 
+        it('parses multiple weapon special rules', () => {
+            const string = `Fusion Pistol (12”, A1, AP(2), Rending) +5pts`;
+            let expected = {
+                name: 'Fusion Pistol',
+                range: 12,
+                attacks: 1,
+                rules: ['AP(2)', 'Rending'],
+                cost: 5
+            };
+            expect(parser.parseUpgrade(string)).to.deep.equal(expected);
+        });
+
+        it('parses a lot of weapon special rules', () => {
+            const string = `BFG (48”, A12, AP(2), Blast(3), Deadly(6), Indirect, Rending) +100pts`;
+            let expected = {
+                name: 'BFG',
+                range: 48,
+                attacks: 12,
+                rules: ['AP(2)', 'Blast(3)', 'Deadly(6)', 'Indirect', 'Rending'],
+                cost: 100
+            };
+            expect(parser.parseUpgrade(string)).to.deep.equal(expected);
+        });
+
     });
 
     describe('Detecting rules', () => {
