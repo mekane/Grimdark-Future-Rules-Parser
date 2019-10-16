@@ -290,6 +290,18 @@ describe('Parsing the upgrade lines', () => {
             };
             expect(parser.parseUpgrade(string)).to.deep.equal(expected);
         });
+
+        it('parses a plain text weapon rule', () => {
+            const string = `Gravity Pistol (12”, A1, Rending) +5pts`;
+            let expected = {
+                name: 'Gravity Pistol',
+                range: 12,
+                attacks: 1,
+                rules: ['Rending'],
+                cost: 5
+            };
+            expect(parser.parseUpgrade(string)).to.deep.equal(expected);
+        });
     });
 
     describe('Detecting rules', () => {
