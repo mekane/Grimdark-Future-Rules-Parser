@@ -257,7 +257,7 @@ describe('Parsing the upgrade lines', () => {
 
         it('parses a one-word name, two digit range with no special rules', () => {
             const string = "Pistol (12”, A2) +5pts";
-            let expected = {
+            const expected = {
                 name: 'Pistol',
                 range: 12,
                 attacks: 2,
@@ -269,7 +269,7 @@ describe('Parsing the upgrade lines', () => {
 
         it('parses a two-word name, two digit range with no special rules', () => {
             const string = "Storm Rifle (24”, A2) +15pts";
-            let expected = {
+            const expected = {
                 name: 'Storm Rifle',
                 range: 24,
                 attacks: 2,
@@ -281,7 +281,7 @@ describe('Parsing the upgrade lines', () => {
 
         it('parses a three-word name including hyphens', () => {
             const string = "Twin Heavy Bio-Carbine (18”, A6) +25pts";
-            let expected = {
+            const expected = {
                 name: 'Twin Heavy Bio-Carbine',
                 range: 18,
                 attacks: 6,
@@ -293,7 +293,7 @@ describe('Parsing the upgrade lines', () => {
 
         it('parses a melee (no range) weapon with no special rules', () => {
             const string = "Razor Claws (A2) +10pts";
-            let expected = {
+            const expected = {
                 name: 'Razor Claws',
                 range: 'melee',
                 attacks: 2,
@@ -305,7 +305,7 @@ describe('Parsing the upgrade lines', () => {
 
         it('parses a plain text weapon rule', () => {
             const string = `Gravity Pistol (12”, A1, Rending) +5pts`;
-            let expected = {
+            const expected = {
                 name: 'Gravity Pistol',
                 range: 12,
                 attacks: 1,
@@ -317,7 +317,7 @@ describe('Parsing the upgrade lines', () => {
 
         it('parses a weapon rule with parentheses', () => {
             const string = `Fusion Pistol (12”, A1, AP(2)) +5pts`;
-            let expected = {
+            const expected = {
                 name: 'Fusion Pistol',
                 range: 12,
                 attacks: 1,
@@ -329,7 +329,7 @@ describe('Parsing the upgrade lines', () => {
 
         it('parses multiple weapon special rules', () => {
             const string = `Fusion Pistol (12”, A1, AP(2), Rending) +5pts`;
-            let expected = {
+            const expected = {
                 name: 'Fusion Pistol',
                 range: 12,
                 attacks: 1,
@@ -341,7 +341,7 @@ describe('Parsing the upgrade lines', () => {
 
         it('parses a lot of weapon special rules', () => {
             const string = `BFG (48”, A12, AP(2), Blast(3), Deadly(6), Indirect, Rending) +100pts`;
-            let expected = {
+            const expected = {
                 name: 'BFG',
                 range: 48,
                 attacks: 12,
@@ -350,11 +350,6 @@ describe('Parsing the upgrade lines', () => {
             };
             expect(parser.parseUpgrade(string)).to.deep.equal(expected);
         });
-
-    });
-
-    describe('Detecting rules', () => {
-
     });
 
 });
