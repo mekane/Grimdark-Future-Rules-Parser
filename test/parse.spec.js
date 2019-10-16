@@ -279,6 +279,18 @@ describe('Parsing the upgrade lines', () => {
             expect(parser.parseUpgrade(string)).to.deep.equal(expected);
         });
 
+        it('parses a three-word name including hyphens', () => {
+            const string = "Twin Heavy Bio-Carbine (18”, A6) +25pts";
+            let expected = {
+                name: 'Twin Heavy Bio-Carbine',
+                range: 18,
+                attacks: 6,
+                rules: [],
+                cost: 25
+            };
+            expect(parser.parseUpgrade(string)).to.deep.equal(expected);
+        });
+
         it('parses a melee (no range) weapon with no special rules', () => {
             const string = "Razor Claws (A2) +10pts";
             let expected = {
