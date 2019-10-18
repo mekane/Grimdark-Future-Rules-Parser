@@ -90,23 +90,26 @@ function parseGroup(stringToParse) {
  * ([,\w \(\)]*)\) - just captures all of the potential rules text, to be parsed later
  *  \+(\d{1,3})pts - captures the number part of the points
  */
-const weaponSpec = /([\w- ]+) \((?:(\d{1,2})(?:"|”), )?A(\d{1,2})([,\w \(\)]*)\) \+(\d{1,3})pts$/;
+const weaponSpec = /^([\w- ]+) \((?:(\d{1,2})(?:"|”), )?A(\d{1,2})([,\w \(\)]*)\)(?: \+(\d{1,3})pts)?$/;
 
 function parseUpgrade(stringToParse) {
     const pattern = stringToParse.match(weaponSpec);
-    //console.log(pattern);
 
     if (pattern == null)
         return parseNonWeaponUpgrade(stringToParse);
 
-    const range = parseInt(pattern[2], 10);
+    return weaponObjectFromRegexMatch(pattern);
+}
+
+function weaponObjectFromRegexMatch(matchObj) {
+    const range = parseInt(matchObj[2], 10);
 
     return {
-        name: pattern[1],
+        name: matchObj[1],
         range: isNaN(range) ? 'melee' : range,
-        attacks: parseInt(pattern[3], 10),
-        rules: parseRules(pattern[4]),
-        cost: parseInt(pattern[5], 10)
+        attacks: parseInt(matchObj[3], 10),
+        rules: parseRules(matchObj[4]),
+        cost: parseInt(matchObj[5], 10)
     };
 }
 
@@ -118,20 +121,60 @@ function parseRules(stringToParse) {
 }
 
 function parseNonWeaponUpgrade(stringToParse) {
-    const pattern = stringToParse.match(/([\w- ]+) (?:\(([\w-\+, \(\)]+)\))? ?\+(\d{1,3})pts$/);
+    const pattern = stringToParse.match(/([\w- ]+) (?:\(([\w-\+,” \(\)]+)\))? ?\+(\d{1,3})pts$/);
 
-    let rules = [];
-    if (pattern[2] && pattern[2].length)
-        rules = pattern[2].split(',').map(s => s.trim()).filter(s => s.length);
+    let ruleTokens = [];
+    const rules = [];
+    const weapons = [];
+
+    if (pattern[2] && pattern[2].length) {
+        ruleTokens = splitByCommas(pattern[2]);
+        ruleTokens.forEach(t => {
+            let weapon = t.match(weaponSpec);
+            console.log(`  --check ${t}`, weapon);
+            if (weapon == null)
+                rules.push(t);
+            else
+                weapons.push(weaponObjectFromRegexMatch(weapon));
+        });
+    }
 
     return {
         name: pattern[1],
         rules: rules,
+        weapons: weapons,
         cost: parseInt(pattern[3], 10)
     };
 }
 
+function splitByCommas(textToTokenize) {
+    const tokens = [];
+
+    let currentToken = '';
+    let insideParens = false;
+
+    for (let i = 0; i < textToTokenize.length; i++) {
+        let char = textToTokenize.charAt(i);
+
+        if (char === '(')
+            insideParens = true;
+        if (char === ')')
+            insideParens = false;
+
+        if (char === ',' && !insideParens) {
+            tokens.push(currentToken);
+            currentToken = '';
+        }
+        else
+            currentToken += char;
+    }
+    tokens.push(currentToken);
+
+    return tokens.map(s => s.trim()).filter(s => s.length);
+}
+
 module.exports = {
     parseGroup,
-    parseUpgrade
+    parseUpgrade,
+    splitByCommas
 };

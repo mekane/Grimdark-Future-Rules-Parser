@@ -243,6 +243,11 @@ describe('Parsing the group headers', () => {
 
 describe('Parsing the upgrade lines', () => {
     describe('Detecting weapons', () => {
+
+        //TODO: rework the top-level upgrade result structure so it doesn't assume weapons
+        //i.e. the upgrades that are plain weapons should still return an object and put
+        //the weapon(s) in an array on a weapons: property
+
         it('returns a data structure of Weapon Name, attacks, rules, and point cost', () => {
             const string = `Pistol (6", A1) +5pts`;
             const result = parser.parseUpgrade(string);
@@ -358,6 +363,7 @@ describe('Parsing the upgrade lines', () => {
             const expected = {
                 name: 'Transport Spore',
                 rules: [],
+                weapons: [],
                 cost: 20
             };
 
@@ -369,6 +375,7 @@ describe('Parsing the upgrade lines', () => {
             const expected = {
                 name: 'Adrenaline',
                 rules: ['Furious'],
+                weapons: [],
                 cost: 5
             };
 
@@ -380,6 +387,7 @@ describe('Parsing the upgrade lines', () => {
             const expected = {
                 name: 'Acid Bite',
                 rules: ['AP(+1) in melee'],
+                weapons: [],
                 cost: 5
             };
 
@@ -391,10 +399,62 @@ describe('Parsing the upgrade lines', () => {
             const expected = {
                 name: 'Destroyer Armor',
                 rules: ['Ambush', 'Tough(+3)'],
+                weapons: [],
                 cost: 70
             };
 
             expect(parser.parseUpgrade(string)).to.deep.equal(expected);
         });
+
+        it(`parses weapons from parentheses`, () => {
+            const string = `Bike (Fast, Twin Assault Rifle (24”, A2)) +70pts`;
+            const expected = {
+                name: 'Bike',
+                rules: ['Fast'],
+                weapons: [{
+                    name: 'Twin Assault Rifle',
+                    range: 24,
+                    attacks: 2,
+                    rules: [],
+                    cost: NaN //TODO: separate this out from the weapon parsing
+                }],
+                cost: 70
+            };
+
+            expect(parser.parseUpgrade(string)).to.deep.equal(expected);
+        });
+
+
+        //TODO: could assert that Tough(+3) adds the Tough rule and +3 to the tough property
+    });
+});
+
+describe('Tokenizing lists by splitting on ",", but not inside ()', () => {
+    it('returns an array of tekens broken up by commas', () => {
+        const testString = "Token one,Token two,Token three";
+        const expected = ['Token one', 'Token two', 'Token three'];
+
+        expect(parser.splitByCommas(testString)).to.deep.equal(expected);
+    });
+
+    it('trims whitespace from the individual tokens', () => {
+        const testString = " Token one , Token two , Token three ";
+        const expected = ['Token one', 'Token two', 'Token three'];
+
+        expect(parser.splitByCommas(testString)).to.deep.equal(expected);
+    });
+
+    it('ignores empty tokens (filters them out)', () => {
+        const testString = ", Token one, Token two, Token three, ,";
+        const expected = ['Token one', 'Token two', 'Token three'];
+
+        expect(parser.splitByCommas(testString)).to.deep.equal(expected);
+    });
+
+    it('does not split by commas that are inside parentheses', () => {
+        const testString = "Name, Age, (Address, Street, Zip)";
+        const expected = ['Name', 'Age', '(Address, Street, Zip)'];
+
+        expect(parser.splitByCommas(testString)).to.deep.equal(expected);
     });
 });
