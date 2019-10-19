@@ -95,22 +95,42 @@ const weaponSpec = /^([\w- ]+) \((?:(\d{1,2})(?:"|”), )?A(\d{1,2})([,\w \(\)]*
 function parseUpgrade(stringToParse) {
     const pattern = stringToParse.match(weaponSpec);
 
-    if (pattern == null)
-        return parseNonWeaponUpgrade(stringToParse);
+    let upgrade = {};
 
-    return weaponObjectFromRegexMatch(pattern);
+    if (pattern == null) {
+        return parseNonWeaponUpgrade(stringToParse);
+    }
+    else {
+        upgrade = weaponObjectFromRegexMatch(pattern);
+        const cost = upgrade.cost;
+        delete upgrade.cost;
+        return {
+            name: '',
+            rules: [],
+            weapons: [
+                upgrade
+            ],
+            cost
+        }
+    }
 }
 
 function weaponObjectFromRegexMatch(matchObj) {
     const range = parseInt(matchObj[2], 10);
 
-    return {
+    const weapon = {
         name: matchObj[1],
         range: isNaN(range) ? 'melee' : range,
         attacks: parseInt(matchObj[3], 10),
-        rules: parseRules(matchObj[4]),
-        cost: parseInt(matchObj[5], 10)
+        rules: parseRules(matchObj[4])
     };
+
+    const cost = parseInt(matchObj[5], 10);
+
+    if (!isNaN(cost))
+        weapon.cost = cost;
+
+    return weapon;
 }
 
 function parseRules(stringToParse) {
@@ -131,7 +151,6 @@ function parseNonWeaponUpgrade(stringToParse) {
         ruleTokens = splitByCommas(pattern[2]);
         ruleTokens.forEach(t => {
             let weapon = t.match(weaponSpec);
-            console.log(`  --check ${t}`, weapon);
             if (weapon == null)
                 rules.push(t);
             else
