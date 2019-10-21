@@ -34,10 +34,15 @@ function parseGroup(stringToParse) {
         add: []
     };
 
+    if (token.length > 3 && (token[0] + token[1] + token[2] === 'Anymodelmay')) {
+        token.shift();
+        token.shift();
+        token.shift();
+    }
 
-    if (token[0] === 'Replace')
+    if (token[0].toLowerCase() === 'replace')
         upgradeSpec.remove = [];
-    else if (token[0] === 'Take')
+    else if (token[0] == 'Take')
         1 + 1;
     else if (token[0] === 'Upgrade')
         1 + 1;

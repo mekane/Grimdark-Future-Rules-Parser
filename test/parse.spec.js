@@ -140,102 +140,186 @@ describe('Parsing the group headers', () => {
     });
 
     describe('Some real examples', () => {
-        it.skip('Correctly parses "Any model may replace one Razor Claws:"', () => {
+        it.skip('Correctly parses "Upgrade Psychic(1):"', () => {
+            const string = "Upgrade Psychic(1):";
+            const expected = {
 
+            };
+            expect(parser.parseGroup(string)).to.deep.equal(expected);
+        });
+
+        it('Correctly parses "Any model may replace one Razor Claws:"', () => {
+            const string = "Any model may replace one Razor Claws:";
+            const expected = {
+                limit: 'models',
+                remove: ['Razor Claws']
+            };
+            expect(parser.parseGroup(string)).to.deep.equal(expected);
         });
 
         it.skip('Correctly parses "Any model may take one Energy Fist attachment:"', () => {
+            const string = "Any model may take one Energy Fist attachment:";
+            const expected = {
 
+            };
+            expect(parser.parseGroup(string)).to.deep.equal(expected);
         });
 
         it.skip('Correctly parses "Replace all Storm Rifles and Energy Fists:"', () => {
+            const string = "Replace all Storm Rifles and Energy Fists:";
+            const expected = {
 
+            };
+            expect(parser.parseGroup(string)).to.deep.equal(expected);
         });
 
         it.skip('Correctly parses "Replace any Assault Rifle and CCW:"', () => {
+            const string = "Replace any Assault Rifle and CCW:";
+            const expected = {
 
+            };
+            expect(parser.parseGroup(string)).to.deep.equal(expected);
         });
 
         it.skip('Correctly parses "Replace any Razor Claws:"', () => {
+            const string = "Replace any Razor Claws:";
+            const expected = {
 
+            };
+            expect(parser.parseGroup(string)).to.deep.equal(expected);
         });
 
         it.skip('Correctly parses "Replace one AR and CCW:"', () => {
+            const string = "Replace one AR and CCW:";
+            const expected = {
 
+            };
+            expect(parser.parseGroup(string)).to.deep.equal(expected);
         });
 
         it.skip('Correctly parses "Replace one CCW:"', () => {
+            const string = "Replace one CCW:";
+            const expected = {
 
+            };
+            expect(parser.parseGroup(string)).to.deep.equal(expected);
         });
 
         it.skip('Correctly parses "Replace one Pistol:"', () => {
+            const string = "Replace one Pistol:";
+            const expected = {
 
+            };
+            expect(parser.parseGroup(string)).to.deep.equal(expected);
         });
 
         it.skip('Correctly parses "Replace Pistol:"', () => {
+            const string = "Replace Pistol:";
+            const expected = {
 
+            };
+            expect(parser.parseGroup(string)).to.deep.equal(expected);
         });
 
         it.skip('Correctly parses "Replace up to two Pistols:"', () => {
+            const string = "Replace up to two Pistols:";
+            const expected = {
 
+            };
+            expect(parser.parseGroup(string)).to.deep.equal(expected);
         });
 
         it.skip('Correctly parses "Replace Walker Fist and Storm Rifle:"', () => {
+            const string = "Replace Walker Fist and Storm Rifle:";
+            const expected = {
 
+            };
+            expect(parser.parseGroup(string)).to.deep.equal(expected);
         });
 
         it.skip('Correctly parses "Replace Frost Cannon, Walker Fist and Storm Rifle:"', () => {
+            const string = "Replace Frost Cannon, Walker Fist and Storm Rifle:";
+            const expected = {
 
+            };
+            expect(parser.parseGroup(string)).to.deep.equal(expected);
         });
 
         it.skip('Correctly parses "Take one Assault Rifle Attachment:"', () => {
+            const string = "Take one Assault Rifle Attachment:";
+            const expected = {
 
+            };
+            expect(parser.parseGroup(string)).to.deep.equal(expected);
         });
 
         it.skip('Correctly parses "Upgrade all models with:"', () => {
-
+            const string = "Upgrade all models with:";
+            const expected = {
+                limit: 1
+            };
+            expect(parser.parseGroup(string)).to.deep.equal(expected);
         });
 
         it.skip('Correctly parses "Upgrade all models with any:"', () => {
+            const string = "Upgrade all models with any:";
+            const expected = {
 
+            };
+            expect(parser.parseGroup(string)).to.deep.equal(expected);
         });
 
         it.skip('Correctly parses "Upgrade any model with:"', () => {
+            const string = "Upgrade any model with:";
+            const expected = {
 
+            };
+            expect(parser.parseGroup(string)).to.deep.equal(expected);
         });
 
-        //this appears to be synonymous with "with one", but in cases where there's only one option
         it.skip('Correctly parses "Upgrade one model with:"', () => {
+            const string = "Upgrade one model with:";
+            const expected = {
 
+            };
+            expect(parser.parseGroup(string)).to.deep.equal(expected);
         });
 
         it.skip('Correctly parses "Upgrade one model with one:"', () => {
+            const string = "Upgrade one model with one:";
+            const expected = {
 
-        });
-
-        it.skip('Correctly parses "Upgrade Psychic(1):"', () => {
-
+            };
+            expect(parser.parseGroup(string)).to.deep.equal(expected);
         });
 
         it.skip('Correctly parses "Upgrade up to two models with one:"', () => {
+            const string = "Upgrade up to two models with one:";
+            const expected = {
 
+            };
+            expect(parser.parseGroup(string)).to.deep.equal(expected);
         });
 
         it.skip('Correctly parses "Upgrade with:"', () => {
+            const string = "Upgrade with:";
+            const expected = {
 
+            };
+            expect(parser.parseGroup(string)).to.deep.equal(expected);
         });
 
         it.skip('Correctly parses "Upgrade with one:"', () => {
+            const string = "Upgrade with one:";
+            const expected = {
 
+            };
+            expect(parser.parseGroup(string)).to.deep.equal(expected);
         });
 
-        it.skip('Correctly parses ""', () => {
+        it.skip('Correctly parses ""', () => {});
 
-        });
-
-        it.skip('Correctly parses ""', () => {
-
-        });
+        it.skip('Correctly parses ""', () => {});
 
         // Holy crap Custodian Brothers - Upgrade with Regeneration - it's flipped!
     });
@@ -414,7 +498,7 @@ describe('Parsing the upgrade lines', () => {
             const string = `Transport Spore +20pts`;
             const expected = {
                 name: 'Transport Spore',
-                rules: [],
+                rules: [], //TODO: special case to put the name in the rules here
                 weapons: [],
                 cost: 20
             };
@@ -481,7 +565,7 @@ describe('Parsing the upgrade lines', () => {
 });
 
 describe('Tokenizing lists by splitting on ",", but not inside ()', () => {
-    it('returns an array of tekens broken up by commas', () => {
+    it('returns an array of tokens broken up by commas', () => {
         const testString = "Token one,Token two,Token three";
         const expected = ['Token one', 'Token two', 'Token three'];
 
