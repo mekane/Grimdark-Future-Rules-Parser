@@ -23,6 +23,7 @@ var numberName = {
 
 const noop = _ => _;
 
+const anyModelMayRegex = /^Any model may (replace|take) (one) (.*):$/;
 const replaceOneRegex = /Replace (\w+)$/;
 const replaceTwoRegex = /Replace (\w+ ?\w+) and (\w+ ?\w+)$/;
 const replaceThreeRegex = /Replace (\w+ ?\w+), (\w+ ?\w+), and (\w+ ?\w+)$/;
@@ -30,24 +31,18 @@ const replaceThreeRegex = /Replace (\w+ ?\w+), (\w+ ?\w+), and (\w+ ?\w+)$/;
 function parseGroup(stringToParse) {
     const token = stringToParse.split(' ');
 
-    const upgradeSpec = {
-        add: []
-    };
-
-    if (token.length > 3 && (token[0] + token[1] + token[2] === 'Anymodelmay')) {
-        token.shift();
-        token.shift();
-        token.shift();
+    const anyModel = stringToParse.match(anyModelMayRegex);
+    if (anyModel !== null) {
+        const action = anyModel[1];
+        const amount = anyModel[2];
+        const item = anyModel[3];
+        const upgradeSpec = getBaseUpgradeSpec(action);
+        upgradeSpec.limit = 'models';
+        upgradeSpec.remove.push(item); //a bit naive, but we'll need more test cases to prove this wrong
+        return upgradeSpec;
     }
 
-    if (token[0].toLowerCase() === 'replace')
-        upgradeSpec.remove = [];
-    else if (token[0] == 'Take')
-        1 + 1;
-    else if (token[0] === 'Upgrade')
-        1 + 1;
-    else
-        throw new Error(`Unknown action ${token[0]}`);
+    const upgradeSpec = getBaseUpgradeSpec(token[0]);
 
     if (token[1] === 'one' || token[1] === 'all' || token[1] === 'with')
         upgradeSpec.limit = 1;
@@ -82,6 +77,20 @@ function parseGroup(stringToParse) {
     return upgradeSpec;
 }
 
+function getBaseUpgradeSpec(actionWord) {
+    const upgradeSpec = {};
+
+    if (actionWord.toLowerCase() === 'replace')
+        upgradeSpec.remove = [];
+    else if (actionWord == 'Take')
+        noop();
+    else if (actionWord === 'Upgrade')
+        noop();
+    else
+        throw new Error(`Unknown action ${actionWord}`);
+
+    return upgradeSpec;
+}
 
 /**
  * (\w+ ?\w+) - capturing group for a one-or-two-word name (optional space)

@@ -35,19 +35,16 @@ describe('Parsing the group headers', () => {
         it(`translates "Replace" into removes and adds`, () => {
             const replace = parser.parseGroup('Replace one');
             expect(replace.remove).to.be.an('array');
-            expect(replace.add).to.be.an('array');
         });
 
         it(`translates "Take" into adds`, () => {
             const take = parser.parseGroup('Take one');
             expect(take.remove).to.be.an('undefined');
-            expect(take.add).to.be.an('array');
         });
 
         it(`translates "Upgrade with" to add equipment or rules`, () => {
             const upgrade = parser.parseGroup('Upgrade with');
             expect(upgrade.remove).to.be.an('undefined');
-            expect(upgrade.add).to.be.an('array');
         });
     });
 
@@ -140,14 +137,6 @@ describe('Parsing the group headers', () => {
     });
 
     describe('Some real examples', () => {
-        it.skip('Correctly parses "Upgrade Psychic(1):"', () => {
-            const string = "Upgrade Psychic(1):";
-            const expected = {
-
-            };
-            expect(parser.parseGroup(string)).to.deep.equal(expected);
-        });
-
         it('Correctly parses "Any model may replace one Razor Claws:"', () => {
             const string = "Any model may replace one Razor Claws:";
             const expected = {
@@ -317,6 +306,17 @@ describe('Parsing the group headers', () => {
             expect(parser.parseGroup(string)).to.deep.equal(expected);
         });
 
+        it.skip('Correctly parses "Upgrade Psychic(1):"', () => {
+            const string = "Upgrade Psychic(1):";
+            const expected = {
+                requiresRule: ['Psychic'],
+                requiresPropertyValue: {
+                    'psychic': 1
+                }
+            };
+            expect(parser.parseGroup(string)).to.deep.equal(expected);
+        });
+
         it.skip('Correctly parses ""', () => {});
 
         it.skip('Correctly parses ""', () => {});
@@ -353,14 +353,12 @@ describe('Parsing the upgrade lines', () => {
             const expected = {
                 name: '',
                 rules: [],
-                weapons: [
-                    {
-                        name: 'Pistol',
-                        range: 12,
-                        attacks: 2,
-                        rules: []
-                    }
-                ],
+                weapons: [{
+                    name: 'Pistol',
+                    range: 12,
+                    attacks: 2,
+                    rules: []
+                }],
                 cost: 5
             };
             expect(parser.parseUpgrade(string)).to.deep.equal(expected);
@@ -371,14 +369,12 @@ describe('Parsing the upgrade lines', () => {
             const expected = {
                 name: '',
                 rules: [],
-                weapons: [
-                    {
-                        name: 'Storm Rifle',
-                        range: 24,
-                        attacks: 2,
-                        rules: []
-                    }
-                ],
+                weapons: [{
+                    name: 'Storm Rifle',
+                    range: 24,
+                    attacks: 2,
+                    rules: []
+                }],
                 cost: 15
             };
             expect(parser.parseUpgrade(string)).to.deep.equal(expected);
@@ -389,14 +385,12 @@ describe('Parsing the upgrade lines', () => {
             const expected = {
                 name: '',
                 rules: [],
-                weapons: [
-                    {
-                        name: 'Twin Heavy Bio-Carbine',
-                        range: 18,
-                        attacks: 6,
-                        rules: [],
-                    }
-                ],
+                weapons: [{
+                    name: 'Twin Heavy Bio-Carbine',
+                    range: 18,
+                    attacks: 6,
+                    rules: [],
+                }],
                 cost: 25
             };
             expect(parser.parseUpgrade(string)).to.deep.equal(expected);
@@ -407,14 +401,12 @@ describe('Parsing the upgrade lines', () => {
             const expected = {
                 name: '',
                 rules: [],
-                weapons: [
-                    {
-                        name: 'Razor Claws',
-                        range: 'melee',
-                        attacks: 2,
-                        rules: []
-                    }
-                ],
+                weapons: [{
+                    name: 'Razor Claws',
+                    range: 'melee',
+                    attacks: 2,
+                    rules: []
+                }],
                 cost: 10
             };
             expect(parser.parseUpgrade(string)).to.deep.equal(expected);
@@ -425,14 +417,12 @@ describe('Parsing the upgrade lines', () => {
             const expected = {
                 name: '',
                 rules: [],
-                weapons: [
-                    {
-                        name: 'Gravity Pistol',
-                        range: 12,
-                        attacks: 1,
-                        rules: ['Rending']
-                    }
-                ],
+                weapons: [{
+                    name: 'Gravity Pistol',
+                    range: 12,
+                    attacks: 1,
+                    rules: ['Rending']
+                }],
                 cost: 5
             };
             expect(parser.parseUpgrade(string)).to.deep.equal(expected);
@@ -443,14 +433,12 @@ describe('Parsing the upgrade lines', () => {
             const expected = {
                 name: '',
                 rules: [],
-                weapons: [
-                    {
-                        name: 'Fusion Pistol',
-                        range: 12,
-                        attacks: 1,
-                        rules: ['AP(2)']
-                    }
-                ],
+                weapons: [{
+                    name: 'Fusion Pistol',
+                    range: 12,
+                    attacks: 1,
+                    rules: ['AP(2)']
+                }],
                 cost: 5
             };
             expect(parser.parseUpgrade(string)).to.deep.equal(expected);
@@ -461,14 +449,12 @@ describe('Parsing the upgrade lines', () => {
             const expected = {
                 name: '',
                 rules: [],
-                weapons: [
-                    {
-                        name: 'Fusion Pistol',
-                        range: 12,
-                        attacks: 1,
-                        rules: ['AP(2)', 'Rending']
-                    }
-                ],
+                weapons: [{
+                    name: 'Fusion Pistol',
+                    range: 12,
+                    attacks: 1,
+                    rules: ['AP(2)', 'Rending']
+                }],
                 cost: 5
             };
             expect(parser.parseUpgrade(string)).to.deep.equal(expected);
@@ -479,14 +465,12 @@ describe('Parsing the upgrade lines', () => {
             const expected = {
                 name: '',
                 rules: [],
-                weapons: [
-                    {
-                        name: 'BFG',
-                        range: 48,
-                        attacks: 12,
-                        rules: ['AP(2)', 'Blast(3)', 'Deadly(6)', 'Indirect', 'Rending']
-                    }
-                ],
+                weapons: [{
+                    name: 'BFG',
+                    range: 48,
+                    attacks: 12,
+                    rules: ['AP(2)', 'Blast(3)', 'Deadly(6)', 'Indirect', 'Rending']
+                }],
                 cost: 100
             };
             expect(parser.parseUpgrade(string)).to.deep.equal(expected);
