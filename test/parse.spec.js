@@ -44,8 +44,8 @@ describe('Parsing the group headers', () => {
         });
 
         it(`sets the limit to X for "up to X"`, () => {
-            const replaceUpToTwo = parser.parseGroup('Replace up to two');
-            expect(replaceUpToTwo.limit).to.equal(2);
+            const replaceUpToTwo = parser.parseGroup('Replace up to three');
+            expect(replaceUpToTwo.limit).to.equal(3);
         });
 
         it.skip(`sets the limit to one for "Upgrade one model with:"`, () => {
@@ -124,7 +124,7 @@ describe('Parsing "Replace" upgrade headers', () => {
         });
 
         it(`correctly parses replacement of three items, no spaces`, () => {
-            const replace = parser.parseGroup('Replace Gun, Sword, and Shield:');
+            const replace = parser.parseGroup('Replace Gun, Sword and Shield:');
             const expected = {
                 limit: 1,
                 replace: ['Gun', 'Sword', 'Shield']
@@ -198,74 +198,90 @@ describe('Parsing "Replace" upgrade headers', () => {
         expect(parser.parseGroup(string)).to.deep.equal(expected);
     });
 
-    it.skip('Correctly parses "Replace any Assault Rifle and CCW:"', () => {
+    it('Correctly parses "Replace any Assault Rifle and CCW:"', () => {
         const string = "Replace any Assault Rifle and CCW:";
         const expected = {
-
+            replace: ['Assault Rifle', 'CCW']
         };
         expect(parser.parseGroup(string)).to.deep.equal(expected);
     });
 
-    it.skip('Correctly parses "Replace any Razor Claws:"', () => {
+    it('Correctly parses "Replace any Razor Claws:"', () => {
         const string = "Replace any Razor Claws:";
         const expected = {
-
+            replace: ['Razor Claws']
         };
         expect(parser.parseGroup(string)).to.deep.equal(expected);
     });
 
-    it.skip('Correctly parses "Replace one AR and CCW:"', () => {
+    it('Correctly parses "Replace one AR and CCW:"', () => {
         const string = "Replace one AR and CCW:";
         const expected = {
-
+            limit: 1,
+            replace: ['AR', 'CCW']
         };
         expect(parser.parseGroup(string)).to.deep.equal(expected);
     });
 
-    it.skip('Correctly parses "Replace one CCW:"', () => {
+    it('Correctly parses "Replace one CCW:"', () => {
         const string = "Replace one CCW:";
         const expected = {
-
+            limit: 1,
+            replace: ['CCW']
         };
         expect(parser.parseGroup(string)).to.deep.equal(expected);
     });
 
-    it.skip('Correctly parses "Replace one Pistol:"', () => {
+    it('Correctly parses "Replace one Pistol:"', () => {
         const string = "Replace one Pistol:";
         const expected = {
-
+            limit: 1,
+            replace: ['Pistol']
         };
         expect(parser.parseGroup(string)).to.deep.equal(expected);
     });
 
-    it.skip('Correctly parses "Replace Pistol:"', () => {
+    it('Correctly parses "Replace Pistol:"', () => {
         const string = "Replace Pistol:";
         const expected = {
-
+            limit: 1,
+            replace: ['Pistol']
         };
         expect(parser.parseGroup(string)).to.deep.equal(expected);
     });
 
-    it.skip('Correctly parses "Replace up to two Pistols:"', () => {
+    it('Correctly parses "Replace Assault Rifle:"', () => {
+        const string = "Replace Assault Rifle:";
+        const expected = {
+            limit: 1,
+            replace: ['Assault Rifle']
+        };
+        expect(parser.parseGroup(string)).to.deep.equal(expected);
+    });
+
+    it('Correctly parses "Replace up to two Pistols:"', () => {
         const string = "Replace up to two Pistols:";
         const expected = {
-
+            limit: 2,
+            replace: ['Pistol']
         };
         expect(parser.parseGroup(string)).to.deep.equal(expected);
     });
 
-    it.skip('Correctly parses "Replace Walker Fist and Storm Rifle:"', () => {
+    it('Correctly parses "Replace Walker Fist and Storm Rifle:"', () => {
         const string = "Replace Walker Fist and Storm Rifle:";
         const expected = {
-
+            limit: 1,
+            replace: ['Walker Fist', 'Storm Rifle']
         };
         expect(parser.parseGroup(string)).to.deep.equal(expected);
     });
 
-    it.skip('Correctly parses "Replace Frost Cannon, Walker Fist and Storm Rifle:"', () => {
+    it('Correctly parses "Replace Frost Cannon, Walker Fist and Storm Rifle:"', () => {
         const string = "Replace Frost Cannon, Walker Fist and Storm Rifle:";
         const expected = {
-
+            limit: 1,
+            replace: ['Frost Cannon', 'Walker Fist', 'Storm Rifle']
         };
         expect(parser.parseGroup(string)).to.deep.equal(expected);
     });

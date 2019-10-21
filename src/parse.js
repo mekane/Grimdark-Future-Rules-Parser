@@ -24,9 +24,9 @@ var numberName = {
 const noop = _ => _;
 
 const anyModelMayRegex = /^Any model may (.*)$/;
-const replaceOneRegex = /(?:[Rr]eplace) (all )?(\w+ ?\w+)$/;
-const replaceTwoRegex = /(?:[Rr]eplace) (all )?(\w+ ?\w+) and (\w+ ?\w+)/;
-const replaceThreeRegex = /(?:[Rr]eplace) (all )?(\w+ ?\w+), (\w+ ?\w+), and (\w+ ?\w+)$/;
+const replaceOneRegex = /(?:[Rr]eplace) (all |any |one )?(\w+ ?\w+)$/;
+const replaceTwoRegex = /(?:[Rr]eplace) (all |any |one )?(\w+ ?\w+) and (\w+ ?\w+)/;
+const replaceThreeRegex = /(?:[Rr]eplace) (all |any |one )?(\w+ ?\w+), (\w+ ?\w+),? and (\w+ ?\w+)$/;
 
 function parseGroup(upgradeText) {
     let stringToParse = stripTrailingCharacter(upgradeText, ':');
@@ -59,6 +59,10 @@ function parseGroup(upgradeText) {
 
                     if (token[1] + token[2] === 'upto')
                         upgradeSpec.limit = numberName[token[3]];
+
+                    const allRemainingTokens = token.slice(4);
+
+                    upgradeSpec.replace = allRemainingTokens.map(makeSingular);
                 }
             }
         }
@@ -86,22 +90,24 @@ function stripTrailingCharacter(str, char) {
     return str.charAt(str.length - 1) === char ? str.slice(0, -1) : str;
 }
 
+function makeSingular(str) {
+    return stripTrailingCharacter(str, 's');
+}
+
 function populateReplaceSpec(upgrade, match) {
     const all = match[1] || '';
     const weapon1 = match[2];
     const weapon2 = match[3];
     const weapon3 = match[4];
 
-    upgrade.limit = 1;
-
     if (all.trim() === 'all') {
-        upgrade.replaceAll = [stripTrailingCharacter(weapon1, 's')];
+        upgrade.replaceAll = [makeSingular(weapon1)];
 
         if (weapon2)
-            upgrade.replaceAll.push(stripTrailingCharacter(weapon2, 's'));
+            upgrade.replaceAll.push(makeSingular(weapon2));
 
         if (weapon3)
-            upgrade.replaceAll.push(stripTrailingCharacter(weapon3, 's'));
+            upgrade.replaceAll.push(makeSingular(weapon3));
     }
     else {
         upgrade.replace = [weapon1];
@@ -113,6 +119,12 @@ function populateReplaceSpec(upgrade, match) {
             upgrade.replace.push(weapon3);
     }
 
+    upgrade.limit = upgrade.limit || 1;
+
+    if (all.trim() === 'any')
+        delete upgrade.limit;
+
+    console.log(`Replace ${all}${weapon1}${' ' + (weapon2 || '')}${' ' + (weapon3 || '')}`);
 }
 
 /**
