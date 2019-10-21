@@ -23,73 +23,96 @@ var numberName = {
 
 const noop = _ => _;
 
-const anyModelMayRegex = /^Any model may (replace|take) (one) (.*):$/;
-const replaceOneRegex = /Replace (\w+)$/;
-const replaceTwoRegex = /Replace (\w+ ?\w+) and (\w+ ?\w+)$/;
-const replaceThreeRegex = /Replace (\w+ ?\w+), (\w+ ?\w+), and (\w+ ?\w+)$/;
+const anyModelMayRegex = /^Any model may (.*)$/;
+const replaceOneRegex = /(?:[Rr]eplace) (all )?(\w+ ?\w+)$/;
+const replaceTwoRegex = /(?:[Rr]eplace) (all )?(\w+ ?\w+) and (\w+ ?\w+)/;
+const replaceThreeRegex = /(?:[Rr]eplace) (all )?(\w+ ?\w+), (\w+ ?\w+), and (\w+ ?\w+)$/;
 
-function parseGroup(stringToParse) {
+function parseGroup(upgradeText) {
+    let stringToParse = stripTrailingCharacter(upgradeText, ':');
+
+    const upgradeSpec = {};
+
+    const anyModelMatch = stringToParse.match(anyModelMayRegex);
+    if (anyModelMatch !== null) {
+        upgradeSpec.limit = "models";
+        stringToParse = anyModelMatch[1];
+    }
+
     const token = stringToParse.split(' ');
+    const action = token[0];
 
-    const anyModel = stringToParse.match(anyModelMayRegex);
-    if (anyModel !== null) {
-        const action = anyModel[1];
-        const amount = anyModel[2];
-        const item = anyModel[3];
-        const upgradeSpec = getBaseUpgradeSpec(action);
-        upgradeSpec.limit = 'models';
-        upgradeSpec.remove.push(item); //a bit naive, but we'll need more test cases to prove this wrong
-        return upgradeSpec;
+    if (action.toLowerCase() === 'replace') {
+        const replace3 = stringToParse.match(replaceThreeRegex);
+        if (replace3 !== null)
+            populateReplaceSpec(upgradeSpec, replace3);
+        else { //try two
+            const replace2 = stringToParse.match(replaceTwoRegex);
+            if (replace2 !== null)
+                populateReplaceSpec(upgradeSpec, replace2);
+            else {
+                const replace1 = stringToParse.match(replaceOneRegex);
+                if (replace1 !== null)
+                    populateReplaceSpec(upgradeSpec, replace1);
+                else {
+                    console.log(`Didn't find any matches for replace rule ${stringToParse}`);
+
+                    if (token[1] + token[2] === 'upto')
+                        upgradeSpec.limit = numberName[token[3]];
+                }
+            }
+        }
     }
-
-    const upgradeSpec = getBaseUpgradeSpec(token[0]);
-
-    if (token[1] === 'one' || token[1] === 'all' || token[1] === 'with')
-        upgradeSpec.limit = 1;
-    else if (token[1] === 'any')
+    else if (action === 'Take')
         noop();
-    else if (token[1] + token[2] === 'upto')
-        upgradeSpec.limit = numberName[token[3]];
-    else {
-        let replace = stringToParse.match(replaceThreeRegex);
-        if (replace !== null) {
-            const weapon1 = replace[1];
-            const weapon2 = replace[2];
-            const weapon3 = replace[3];
-            //console.log(`Going to replace ${weapon1}, ${weapon2} and ${weapon3}`);
-            upgradeSpec.limit = 1;
-        }
+    else if (action === 'Upgrade')
+        noop();
+    else
+        throw new Error(`Unknown action ${action}`);
 
-        replace = stringToParse.match(replaceTwoRegex);
-        if (replace !== null) {
-            const weapon1 = replace[1];
-            const weapon2 = replace[2];
-            upgradeSpec.limit = 1;
-        }
 
-        replace = stringToParse.match(replaceOneRegex);
-        if (replace !== null) {
-            const weapon = replace[1];
-            upgradeSpec.limit = 1;
+    /*
+        const test = stringToParse.match(/foo/);
+        if (test !== null) {
+            console.log('==================== TEST ====================');
+            console.log(test);
         }
-    }
+    */
 
     return upgradeSpec;
 }
 
-function getBaseUpgradeSpec(actionWord) {
-    const upgradeSpec = {};
+function stripTrailingCharacter(str, char) {
+    return str.charAt(str.length - 1) === char ? str.slice(0, -1) : str;
+}
 
-    if (actionWord.toLowerCase() === 'replace')
-        upgradeSpec.remove = [];
-    else if (actionWord == 'Take')
-        noop();
-    else if (actionWord === 'Upgrade')
-        noop();
-    else
-        throw new Error(`Unknown action ${actionWord}`);
+function populateReplaceSpec(upgrade, match) {
+    const all = match[1] || '';
+    const weapon1 = match[2];
+    const weapon2 = match[3];
+    const weapon3 = match[4];
 
-    return upgradeSpec;
+    upgrade.limit = 1;
+
+    if (all.trim() === 'all') {
+        upgrade.replaceAll = [stripTrailingCharacter(weapon1, 's')];
+
+        if (weapon2)
+            upgrade.replaceAll.push(stripTrailingCharacter(weapon2, 's'));
+
+        if (weapon3)
+            upgrade.replaceAll.push(stripTrailingCharacter(weapon3, 's'));
+    }
+    else {
+        upgrade.replace = [weapon1];
+
+        if (weapon2)
+            upgrade.replace.push(weapon2);
+
+        if (weapon3)
+            upgrade.replace.push(weapon3);
+    }
+
 }
 
 /**
