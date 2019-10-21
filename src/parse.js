@@ -67,7 +67,7 @@ function parseGroup(upgradeText) {
             }
         }
     }
-    else if (action === 'Take')
+    else if (action.toLowerCase() === 'take')
         noop();
     else if (action === 'Upgrade')
         noop();

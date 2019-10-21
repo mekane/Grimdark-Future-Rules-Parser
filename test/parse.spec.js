@@ -291,16 +291,17 @@ describe('Parsing "Take" upgrade headers', () => {
     it.skip('Correctly parses "Any model may take one Energy Fist attachment:"', () => {
         const string = "Any model may take one Energy Fist attachment:";
         const expected = {
-            requires: ['Energy Fist'],
-            limit: 'Energy Fist'
+            limit: 'Energy Fist', //models, but if not every model has an energy fist then it's the number that do
+            require: ['Energy Fist']
         };
         expect(parser.parseGroup(string)).to.deep.equal(expected);
     });
 
-    it.skip('Correctly parses "Take one Assault Rifle Attachment:"', () => {
+    it('Correctly parses "Take one Assault Rifle Attachment:"', () => {
         const string = "Take one Assault Rifle Attachment:";
         const expected = {
-
+            limit: 1,
+            require: ['Assault Rifle']
         };
         expect(parser.parseGroup(string)).to.deep.equal(expected);
     });
