@@ -8,3 +8,8 @@ adjusted it's a pain to adjust all the tests too since they require some manual
 setup of the actual and expected conditions. Being able to just type in the
 sentences and have the tests assemble themselves out of that would be great.
 
+## TODO
+
+   * Parse units into army definition data structure
+   * Parse whole upgrade section
+   * 

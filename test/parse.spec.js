@@ -301,10 +301,13 @@ describe('Parsing "Take" upgrade headers', () => {
         const string = "Take one Assault Rifle Attachment:";
         const expected = {
             limit: 1,
-            require: ['Assault Rifle']
+            require: ['Assault Rifle Attachment']
         };
         expect(parser.parseGroup(string)).to.deep.equal(expected);
     });
+    //TODO: more cases for "Take":
+    //   * multiple items (and)
+    //   * other limits
 });
 
 describe('Parsing "Upgrade" upgrade headers', () => {

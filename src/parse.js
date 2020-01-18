@@ -1,4 +1,4 @@
-var numberName = {
+const numberName = {
     one: 1,
     two: 2,
     three: 3,
@@ -67,8 +67,13 @@ function parseGroup(upgradeText) {
             }
         }
     }
-    else if (action.toLowerCase() === 'take')
-        noop();
+    else if (action.toLowerCase() === 'take') {
+        const number = token[1];
+        const upgradeRequires = token.slice(2).join(' ');
+
+        upgradeSpec.limit = numberName[number];
+        upgradeSpec.require = [upgradeRequires];
+    }
     else if (action === 'Upgrade')
         noop();
     else
