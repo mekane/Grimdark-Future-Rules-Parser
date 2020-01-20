@@ -188,19 +188,7 @@ function weaponObjectFromRegexMatch(matchObj) {
     };
 
     //look for rules with values like AP(2) and add the values as properties to the weapon
-    rules.forEach(rule => {
-        const match = rule.match(ruleWithValueRegex);
-
-        if (match) {
-            const ruleText = match[1];
-            const ruleValue = parseInt(match[2], 10);
-            //console.log(`${ruleText} => ${ruleValue}`);
-            weapon.rules.push(ruleText);
-            weapon[ruleText.toLowerCase()] = ruleValue;
-        }
-        else
-            weapon.rules.push(rule);
-    });
+    extractRulesWithValues(weapon, rules);
 
     const cost = parseInt(matchObj[5], 10);
 
@@ -217,18 +205,34 @@ function parseRules(stringToParse) {
     return stringToParse.trim().replace(/,/g, '').split(' ').filter(s => s.length);
 }
 
+function extractRulesWithValues(upgradeObject, rulesText) {
+    rulesText.forEach(rule => {
+        const match = rule.match(ruleWithValueRegex);
+
+        if (match) {
+            const ruleText = match[1];
+            const ruleValue = parseInt(match[2], 10);
+            //console.log(`${ruleText} => ${ruleValue}`);
+            upgradeObject.rules.push(ruleText);
+            upgradeObject[ruleText.toLowerCase()] = ruleValue;
+        }
+        else
+            upgradeObject.rules.push(rule);
+    });
+}
+
 function parseNonWeaponUpgrade(stringToParse) {
     const pattern = stringToParse.match(/([\w- ]+) (?:\(([\w-\+,” \(\)]+)\))? ?\+(\d{1,3})pts$/);
 
-    let ruleTokens = [];
+    let upgradeTokens = [];
     const unitRules = [];
     const weapons = [];
 
     const name = pattern[1];
 
     if (pattern[2] && pattern[2].length) {
-        ruleTokens = splitByCommas(pattern[2]);
-        ruleTokens.forEach(t => {
+        upgradeTokens = splitByCommas(pattern[2]);
+        upgradeTokens.forEach(t => {
             let weapon = t.match(weaponSpec);
             if (weapon == null)
                 unitRules.push(t);
@@ -246,23 +250,7 @@ function parseNonWeaponUpgrade(stringToParse) {
         cost
     };
 
-    unitRules.forEach(rule => {
-        const match = rule.match(ruleWithValueRegex);
-
-        if (match) {
-            const ruleText = match[1];
-            const ruleValue = parseInt(match[2], 10);
-            //console.log(`${ruleText} => ${ruleValue}`);
-            upgrade.rules.push(ruleText);
-            upgrade[ruleText.toLowerCase()] = ruleValue;
-        }
-        else
-            upgrade.rules.push(rule);
-    });
-
-    console.log('\nRule Text: ' + stringToParse);
-    console.log('rule tokens:', ruleTokens);
-    console.log('upgrade:', upgrade);
+    extractRulesWithValues(upgrade, unitRules);
 
     return upgrade;
 }
