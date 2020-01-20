@@ -12,4 +12,4 @@ sentences and have the tests assemble themselves out of that would be great.
 
    * Parse units into army definition data structure
    * Parse whole upgrade section
-   * 
+   * Open a pdf and parse it - this would allow easier testing of upgrades to the lists

@@ -28,6 +28,8 @@ const replaceOneRegex = /(?:[Rr]eplace) (all |any |one )?(\w+ ?\w+)$/;
 const replaceTwoRegex = /(?:[Rr]eplace) (all |any |one )?(\w+ ?\w+) and (\w+ ?\w+)/;
 const replaceThreeRegex = /(?:[Rr]eplace) (all |any |one )?(\w+ ?\w+), (\w+ ?\w+),? and (\w+ ?\w+)$/;
 
+const ruleWithValueRegex = /^(\w+)\((\+?\d+)\)$/;
+
 function parseGroup(upgradeText) {
     let stringToParse = stripTrailingCharacter(upgradeText, ':');
 
@@ -133,6 +135,9 @@ function populateReplaceSpec(upgrade, match) {
 }
 
 /**
+ * This regex is used to parse the definition of a weapon inside of an upgrade
+ * line, which means it has a name, range + attacks + rules group, and a cost.
+ *
  * (\w+ ?\w+) - capturing group for a one-or-two-word name (optional space)
  *
  * (\d{1,2}) - capturing group to match a one or two digit range
@@ -170,14 +175,32 @@ function parseUpgrade(stringToParse) {
 }
 
 function weaponObjectFromRegexMatch(matchObj) {
+    const name = matchObj[1];
     const range = parseInt(matchObj[2], 10);
+    const attacks = parseInt(matchObj[3], 10);
+    const rules = parseRules(matchObj[4]);
 
     const weapon = {
-        name: matchObj[1],
+        name,
         range: isNaN(range) ? 'melee' : range,
-        attacks: parseInt(matchObj[3], 10),
-        rules: parseRules(matchObj[4])
+        attacks,
+        rules: []
     };
+
+    //look for rules with values like AP(2) and add the values as properties to the weapon
+    rules.forEach(rule => {
+        const match = rule.match(ruleWithValueRegex);
+
+        if (match) {
+            const ruleText = match[1];
+            const ruleValue = parseInt(match[2], 10);
+            //console.log(`${ruleText} => ${ruleValue}`);
+            weapon.rules.push(ruleText);
+            weapon[ruleText.toLowerCase()] = ruleValue;
+        }
+        else
+            weapon.rules.push(rule);
+    });
 
     const cost = parseInt(matchObj[5], 10);
 
@@ -198,26 +221,50 @@ function parseNonWeaponUpgrade(stringToParse) {
     const pattern = stringToParse.match(/([\w- ]+) (?:\(([\w-\+,” \(\)]+)\))? ?\+(\d{1,3})pts$/);
 
     let ruleTokens = [];
-    const rules = [];
+    const unitRules = [];
     const weapons = [];
+
+    const name = pattern[1];
 
     if (pattern[2] && pattern[2].length) {
         ruleTokens = splitByCommas(pattern[2]);
         ruleTokens.forEach(t => {
             let weapon = t.match(weaponSpec);
             if (weapon == null)
-                rules.push(t);
+                unitRules.push(t);
             else
                 weapons.push(weaponObjectFromRegexMatch(weapon));
         });
     }
 
-    return {
-        name: pattern[1],
-        rules: rules,
-        weapons: weapons,
-        cost: parseInt(pattern[3], 10)
+    const cost = parseInt(pattern[3], 10);
+
+    const upgrade = {
+        name,
+        rules: [],
+        weapons,
+        cost
     };
+
+    unitRules.forEach(rule => {
+        const match = rule.match(ruleWithValueRegex);
+
+        if (match) {
+            const ruleText = match[1];
+            const ruleValue = parseInt(match[2], 10);
+            //console.log(`${ruleText} => ${ruleValue}`);
+            upgrade.rules.push(ruleText);
+            upgrade[ruleText.toLowerCase()] = ruleValue;
+        }
+        else
+            upgrade.rules.push(rule);
+    });
+
+    console.log('\nRule Text: ' + stringToParse);
+    console.log('rule tokens:', ruleTokens);
+    console.log('upgrade:', upgrade);
+
+    return upgrade;
 }
 
 function splitByCommas(textToTokenize) {

@@ -321,57 +321,43 @@ describe('Parsing "Upgrade" upgrade headers', () => {
 
     it.skip('Correctly parses "Upgrade all models with any:"', () => {
         const string = "Upgrade all models with any:";
-        const expected = {
-
-        };
+        const expected = {};
         expect(parser.parseGroup(string)).to.deep.equal(expected);
     });
 
     it.skip('Correctly parses "Upgrade any model with:"', () => {
         const string = "Upgrade any model with:";
-        const expected = {
-
-        };
+        const expected = {};
         expect(parser.parseGroup(string)).to.deep.equal(expected);
     });
 
     it.skip('Correctly parses "Upgrade one model with:"', () => {
         const string = "Upgrade one model with:";
-        const expected = {
-
-        };
+        const expected = {};
         expect(parser.parseGroup(string)).to.deep.equal(expected);
     });
 
     it.skip('Correctly parses "Upgrade one model with one:"', () => {
         const string = "Upgrade one model with one:";
-        const expected = {
-
-        };
+        const expected = {};
         expect(parser.parseGroup(string)).to.deep.equal(expected);
     });
 
     it.skip('Correctly parses "Upgrade up to two models with one:"', () => {
         const string = "Upgrade up to two models with one:";
-        const expected = {
-
-        };
+        const expected = {};
         expect(parser.parseGroup(string)).to.deep.equal(expected);
     });
 
     it.skip('Correctly parses "Upgrade with:"', () => {
         const string = "Upgrade with:";
-        const expected = {
-
-        };
+        const expected = {};
         expect(parser.parseGroup(string)).to.deep.equal(expected);
     });
 
     it.skip('Correctly parses "Upgrade with one:"', () => {
         const string = "Upgrade with one:";
-        const expected = {
-
-        };
+        const expected = {};
         expect(parser.parseGroup(string)).to.deep.equal(expected);
     });
 
@@ -494,7 +480,8 @@ describe('Parsing the upgrade lines', () => {
                     name: 'Fusion Pistol',
                     range: 12,
                     attacks: 1,
-                    rules: ['AP(2)']
+                    rules: ['AP'],
+                    ap: 2
                 }],
                 cost: 5
             };
@@ -510,7 +497,8 @@ describe('Parsing the upgrade lines', () => {
                     name: 'Fusion Pistol',
                     range: 12,
                     attacks: 1,
-                    rules: ['AP(2)', 'Rending']
+                    rules: ['AP', 'Rending'],
+                    ap: 2
                 }],
                 cost: 5
             };
@@ -526,7 +514,10 @@ describe('Parsing the upgrade lines', () => {
                     name: 'BFG',
                     range: 48,
                     attacks: 12,
-                    rules: ['AP(2)', 'Blast(3)', 'Deadly(6)', 'Indirect', 'Rending']
+                    rules: ['AP', 'Blast', 'Deadly', 'Indirect', 'Rending'],
+                    ap: 2,
+                    blast: 3,
+                    deadly: 6
                 }],
                 cost: 100
             };
@@ -575,7 +566,8 @@ describe('Parsing the upgrade lines', () => {
             const string = `Destroyer Armor (Ambush, Tough(+3)) +70pts`;
             const expected = {
                 name: 'Destroyer Armor',
-                rules: ['Ambush', 'Tough(+3)'],
+                rules: ['Ambush', 'Tough'],
+                tough: 3,
                 weapons: [],
                 cost: 70
             };
@@ -600,8 +592,19 @@ describe('Parsing the upgrade lines', () => {
             expect(parser.parseUpgrade(string)).to.deep.equal(expected);
         });
 
+        it('parses numeric values into property values for rules that have a number', () => {
+            const string = 'Battering Tusks (Impact(6)) +20pts';
 
-        //TODO: could assert that Tough(+3) adds the Tough rule and +3 to the tough property
+            const expected = {
+                name: 'Battering Tusks',
+                rules: ['Impact'],
+                impact: 6,
+                weapons: [],
+                cost: 20
+            };
+
+            expect(parser.parseUpgrade(string)).to.deep.equal(expected);
+        });
     });
 });
 
