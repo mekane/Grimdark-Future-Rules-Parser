@@ -48,19 +48,22 @@ describe('Parsing the group headers', () => {
             expect(replaceUpToTwo.limit).to.equal(3);
         });
 
-        it.skip(`sets the limit to one for "Upgrade one model with:"`, () => {
+        it(`sets the limit to one for "Upgrade one model with:"`, () => {
             const upgradeWith = parser.parseGroup("Upgrade one model with:");
             expect(upgradeWith.limit).to.equal(1);
         });
 
-        it.skip(`sets the limit to one for "Upgrade with:"`, () => {
+        it(`sets the limit to one for "Upgrade with:"`, () => {
             const upgradeWith = parser.parseGroup('Upgrade with:');
             expect(upgradeWith.limit).to.equal(1);
         });
 
-        it.skip(`sets the limit to one for "Upgrade all models with any:"`, () => {
-            const upgradeWith = parser.parseGroup('Upgrade with:');
-            expect(upgradeWith.limit).to.equal(1);
+        it(`sets no limit for "Upgrade all models with any:"`, () => {
+            //Note: I think an upgrade with this header and multiple options should not have an upgrade-level limit
+            //since you could add each option. But each option should only be able to be added once (right?). How to
+            //enforce that case?
+            const upgradeWith = parser.parseGroup('Upgrade all models with any:');
+            expect(upgradeWith.limit).to.be.an('undefined');
         });
     });
 });
@@ -288,10 +291,10 @@ describe('Parsing "Replace" upgrade headers', () => {
 });
 
 describe('Parsing "Take" upgrade headers', () => {
-    it.skip('Correctly parses "Any model may take one Energy Fist attachment:"', () => {
+    it('Correctly parses "Any model may take one Energy Fist attachment:"', () => {
         const string = "Any model may take one Energy Fist attachment:";
         const expected = {
-            limit: 'Energy Fist', //models, but if not every model has an energy fist then it's the number that do
+            limit: 'models with Energy Fist', //Will need to be implemented in the upgrade function
             require: ['Energy Fist']
         };
         expect(parser.parseGroup(string)).to.deep.equal(expected);
@@ -301,7 +304,7 @@ describe('Parsing "Take" upgrade headers', () => {
         const string = "Take one Assault Rifle Attachment:";
         const expected = {
             limit: 1,
-            require: ['Assault Rifle Attachment']
+            require: ['Assault Rifle']
         };
         expect(parser.parseGroup(string)).to.deep.equal(expected);
     });

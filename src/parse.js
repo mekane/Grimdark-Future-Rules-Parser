@@ -43,6 +43,9 @@ function parseGroup(upgradeText) {
 
     const token = stringToParse.split(' ');
     const action = token[0];
+    const nextWord = token[1];
+    const nextTwoWords = token[1] + ' ' + token[2];
+    const lastWord = token[token.length - 1];
 
     if (action.toLowerCase() === 'replace') {
         const replace3 = stringToParse.match(replaceThreeRegex);
@@ -71,13 +74,24 @@ function parseGroup(upgradeText) {
     }
     else if (action.toLowerCase() === 'take') {
         const number = token[1];
-        const upgradeRequires = token.slice(2).join(' ');
+        let upgradeRequires = token.slice(2);
 
-        upgradeSpec.limit = numberName[number];
-        upgradeSpec.require = [upgradeRequires];
+        if (lastWord.toLowerCase() === 'attachment') {
+            upgradeRequires = token.slice(2, -1); //drop "attachment" to get the base item required
+            if (upgradeSpec.limit === 'models')
+                upgradeSpec.limit += ' with ' + upgradeRequires.join(' ');
+        }
+
+        if (!upgradeSpec.limit)
+            upgradeSpec.limit = numberName[number];
+
+        upgradeSpec.require = [upgradeRequires.join(' ')];
     }
     else if (action === 'Upgrade')
-        noop();
+        if (nextWord === "with" || nextTwoWords === "one model")
+            upgradeSpec.limit = 1;
+        else
+            noop();
     else
         throw new Error(`Unknown action ${action}`);
 
