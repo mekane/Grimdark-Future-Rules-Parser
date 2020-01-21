@@ -6,26 +6,15 @@ const parser = require('../src/parse');
 //it auto-generates group letters(?)
 //it auto-numbers the items 1,2,3
 
-const exampleBlock = `
-A
-Replace one Assault Rifle and CCW:
-    Pistol (12”, A1) and CCW (A2) Free
-Replace one Pistol:
-    Gravity Pistol (12”, A1, Rending) +5pts
-    Plasma Pistol (12”, A1, AP(2)) +5pts
-    Storm Rifle (24”, A2) +5pts
-Replace one CCW:
-    Energy Sword (A2, AP(1)) +5pts
-    Energy Fist (A2, AP(2)) +10pts
-Take one Assault Rifle attachment:
-    Gravity Rifle (18”, A1, Rending) +10pts
-    Plasma Rifle (24”, A1, AP(2)) +15pts
-    Flamethrower (12”, A6) +15pts
-    Fusion Rifle (12”, A1, AP(4), Deadly(6)) +25pts
-`;
+describe('Parsing unit definitions', () => {
+    //keep track of weapon definitions, output return has of those
+    //reference weapon defs by name in unit definitions
+});
 
+//TODO: another module that turns all of these data structures into output. It would wrap e.g. units in the
+// const UnitName = () => ({ ... JSON ... });
 
-describe('Parsing the group headers', () => {
+describe('Parsing the upgrade group headers', () => {
     describe(`Detecting limits and properties from the second word`, () => {
         it(`limits the upgrade to a single use if the second word is "one"`, () => {
             const replaceOne = parser.parseGroup('Replace one');
@@ -67,7 +56,6 @@ describe('Parsing the group headers', () => {
         });
     });
 });
-
 
 describe('Parsing "Replace" upgrade headers', () => {
     describe('Parsing "Replace all/any" with one, two, or three weapons', () => {
@@ -640,3 +628,94 @@ describe('Tokenizing lists by splitting on ",", but not inside ()', () => {
         expect(parser.splitByCommas(testString)).to.deep.equal(expected);
     });
 });
+
+describe('Parsing blocks of upgrade text', () => {
+
+    const simpleUpgradeText = `
+A
+Replace one:
+Pistol (12”, A1) and CCW (A2) +5pts
+`;
+
+    it('parses a simple block', () => {
+        const actual = parser.parseText(simpleUpgradeText);
+
+        const expected = {
+             A: {
+                 '1': {
+                     description: 'Replace one',
+                     limit: 1,
+                     upgrades: [
+                         {
+                             name: 'Pistol',
+                             weapons: [
+                                 {
+
+                                 },
+                                 {}
+                             ],
+                             cost: 5
+                         }
+                     ]
+                 }
+             }
+        };
+
+        expect(actual).to.deep.equal(expected);
+    });
+
+    const upgradeTextBlock = `
+A
+Replace one Assault Rifle and CCW:
+    Pistol (12”, A1) and CCW (A2) Free
+Replace one Pistol:
+    Gravity Pistol (12”, A1, Rending) +5pts
+    Plasma Pistol (12”, A1, AP(2)) +5pts
+    Storm Rifle (24”, A2) +5pts
+Replace one CCW:
+    Energy Sword (A2, AP(1)) +5pts
+    Energy Fist (A2, AP(2)) +10pts
+Take one Assault Rifle attachment:
+    Gravity Rifle (18”, A1, Rending) +10pts
+    Plasma Rifle (24”, A1, AP(2)) +15pts
+    Flamethrower (12”, A6) +15pts
+    Fusion Rifle (12”, A1, AP(4), Deadly(6)) +25pts
+B
+Upgrade with one:
+    Jetpack (Ambush, Flying)    +15pts
+    Combat Bike (Fast, Impact(1),Twin Assault Rifle (24”,A2))   +2-pts
+    Destroyer Armor (Ambush, Tough(+3)) +70pts
+Upgrade with:
+    Veteran Infantry    +15pts
+`;
+
+    it('parses a more complex block', () => {
+        const actual = parser.parseText(upgradeTextBlock);
+
+        const expectedUpgradeGroupKeys = ['description', 'max', 'upgrades'];
+
+        expect(actual).to.be.an('object');
+        expect(actual['A']).to.be.an('object');
+        expect(actual['B']).to.be.an('object');
+
+        const A = actual('A');
+        expect(A['1']).to.be.an('object').and.to.have.all.keys(expectedUpgradeGroupKeys);
+        expect(A['2']).to.be.an('object').and.to.have.all.keys(expectedUpgradeGroupKeys);
+        expect(A['3']).to.be.an('object').and.to.have.all.keys(expectedUpgradeGroupKeys);
+        expect(A['4']).to.be.an('object').and.to.have.all.keys(expectedUpgradeGroupKeys);
+
+        const B = actual('B');
+        expect(B['1']).to.be.an('object').and.to.have.all.keys(expectedUpgradeGroupKeys);
+        expect(B['2']).to.be.an('object').and.to.have.all.keys(expectedUpgradeGroupKeys);
+
+        //returns an object with keys for the upgrade groups
+        // each of which is an object that has numeric keys for objects that each have:
+        //      description (header)
+        //      max (limit)
+        //      upgrades: an array of objects, each of which is the upgrade information
+        //          cost
+        //          upgrade function
+        expect(actual).to();
+    });
+});
+
