@@ -15,6 +15,8 @@ describe('Parsing unit definitions', () => {
         'Name [x]';
         'Name [1]';
         'Name [1] q+';
+
+        // TODO: show an error message, as friendly and helpful as possible
     });
 
     it('returns a data structure with basic unit properties', () => {

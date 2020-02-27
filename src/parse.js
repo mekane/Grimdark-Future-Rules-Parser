@@ -332,9 +332,13 @@ function parseUnit(stringToParse) {
     let name = '';
 
     //find name by looking until we hit a [x]
-    while (!token[0].startsWith('[')) {
+    while (token.length && !token[0].startsWith('[')) {
         name += token[0] + ' ';
         token.shift();
+    }
+
+    if (token.length < 1) {
+        throw new Error('Missing model count after unit name');
     }
 
     //assume the next token is [integer], and parse it
@@ -403,7 +407,7 @@ function parseUnit(stringToParse) {
         rules,
         upgrades,
         points
-    }
+    };
 }
 
 function isRuleName(text) {
