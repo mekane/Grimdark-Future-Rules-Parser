@@ -21,6 +21,28 @@ const numberName = {
     twenty: 20,
 };
 
+const ruleNames = [
+    'Aircraft',
+    'Ambush',
+    'Fast',
+    'Fear',
+    'Fearless',
+    'Flying',
+    'Furious',
+    'Hero',
+    'Immobile',
+    'Impact',
+    'Psychic',
+    'Regeneration',
+    'Relentless',
+    'Scout',
+    'Slow',
+    'Stealth',
+    'Strider',
+    'Tough',
+    'Transport'
+];
+
 const noop = _ => _;
 
 const anyModelMayRegex = /^Any model may (.*)$/;
@@ -299,9 +321,89 @@ function splitByCommas(textToTokenize) {
     return tokens.map(s => s.trim()).filter(s => s.length);
 }
 
+/*
+Name    Num Q  D  (W                     , W      ) Rule     , Rule, Rule, Rule,  Up, Up, Up Cost
+Captain [1] 3+ 2+ Assault Rifle (24”, A1), CCW (A1) Fearless, Hero, Relentless, Tough(3) A, B, C 110pts
+*/
+
+function parseUnit(stringToParse) {
+    const token = stringToParse.split(' ');
+
+    let name = '';
+
+    //find name by looking until we hit a [x]
+    while (!token[0].startsWith('[')) {
+        name += token[0] + ' ';
+        token.shift();
+    }
+
+    //assume the next token is [integer], and parse it
+    const textBetweenBrackets = token[0].slice(1, -1);
+    const models = parseInt(textBetweenBrackets, 10);
+    token.shift();
+
+    //assume quality looks like n+
+    const quality = parseInt(token[0], 10);
+    token.shift();
+
+    //assume defense looks like n+
+    const defense = parseInt(token[0], 10);
+    token.shift();
+
+    //work backwards to get points
+    let lastToken = token[token.length - 1];
+    //assume points string ends with pts
+    const pointsString = lastToken.slice(0, -3);
+    const points = parseInt(pointsString, 10);
+    token.pop();
+
+    //work backwards to get upgrades until we see a rule
+    lastToken = token[token.length - 1];
+    const upgrades = [];
+    while (lastToken.length && !isRuleName(lastToken)) {
+        let rule = token.pop();
+        if (rule !== '-') {
+            if (rule.endsWith(',')) {
+                rule = rule.slice(0, -1);
+            }
+            upgrades.unshift(rule);
+        }
+        lastToken = token[token.length - 1];
+    }
+
+    //work backwards and grab all the rules
+    const rules = [];
+    while (token.length && isRuleName(lastToken)) {
+        let rule = token.pop();
+        if (rule !== '-') {
+            if (rule.endsWith(',')) {
+                rule = rule.slice(0, -1);
+            }
+            rules.unshift(rule);
+        }
+        lastToken = token[token.length - 1];
+    }
+
+    return {
+        name: name.trim(),
+        models,
+        quality,
+        defense,
+        equipment: [],
+        rules: rules,
+        upgrades,
+        points
+    }
+}
+
+function isRuleName(text) {
+    return ruleNames.some(name => text.startsWith(name));
+}
+
 module.exports = {
     parseUpgradeGroup,
     parseUpgradeSection,
     parseUpgrade,
-    splitByCommas
+    splitByCommas,
+    parseUnit
 };

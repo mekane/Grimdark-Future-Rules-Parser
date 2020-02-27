@@ -6,9 +6,98 @@ const parser = require('../src/parse');
 //it auto-generates group letters(?)
 //it auto-numbers the items 1,2,3
 
-describe('Parsing unit definitions', () => {
-    //keep track of weapon definitions, output return has of those
-    //reference weapon defs by name in unit definitions
+describe.only('Parsing unit definitions', () => {
+    it('handles malformed string gracefully', () => {
+        '';
+        'Dude';
+        'Name [';
+        'Name [2';
+        'Name [x]';
+        'Name [1]';
+        'Name [1] q+';
+    });
+
+    it('returns a data structure with basic unit properties', () => {
+        const unit = parser.parseUnit("Dude [1] 3+ 2+ Hero - 100pts");
+
+        expect(unit).to.be.an('object');
+        expect(unit.name).to.be.a('string');
+        expect(unit.models).to.be.a('number');
+        expect(unit.quality).to.be.a('number');
+        expect(unit.defense).to.be.a('number');
+        expect(unit.equipment).to.be.an('array');
+        expect(unit.rules).to.be.an('array');
+        expect(unit.upgrades).to.be.an('array');
+    });
+
+    it('gets unit name from the first token(s)', () => {
+        const oneTokenName = 'Dude [1] 6+ 6+ Hero - 10pts';
+        const twoTokenName = 'Some Guy [1] 6+ 6+ Hero - 10pts';
+        const threeTokenName = 'The Best One [1] 6+ 6+ Hero - 10pts';
+
+        expect(parser.parseUnit(oneTokenName).name).to.equal('Dude');
+        expect(parser.parseUnit(twoTokenName).name).to.equal('Some Guy');
+        expect(parser.parseUnit(threeTokenName).name).to.equal('The Best One');
+    });
+
+    it('parses number of models from the square brackets following name', () => {
+        const oneModel = 'Dude [1] 6+ 6+ Hero - 10pts';
+        expect(parser.parseUnit(oneModel).models).to.equal(1);
+
+        const threeModels = 'Some Guys [3] 6+ 6+ Hero - 10pts';
+        expect(parser.parseUnit(threeModels).models).to.equal(3);
+
+        const manyModels = 'Many Guys [11] 6+ 6+ Hero - 10pts';
+        expect(parser.parseUnit(manyModels).models).to.equal(11);
+    });
+
+    it('gets quality from the token following models', () => {
+        const qualityTwo = 'Guy [1] 2+ 6+ Hero - 10pts';
+        expect(parser.parseUnit(qualityTwo).quality).to.equal(2);
+
+        const qualityThree = 'Guy [1] 3+ 6+ Hero - 10pts';
+        expect(parser.parseUnit(qualityThree).quality).to.equal(3);
+    });
+
+    it('gets defense from the token following quality', () => {
+        const defenseTwo = 'Guy [1] 6+ 2+ Hero - 10pts';
+        expect(parser.parseUnit(defenseTwo).defense).to.equal(2);
+
+        const defenseThree = 'Guy [1] 2+ 3+ Hero - 10pts';
+        expect(parser.parseUnit(defenseThree).defense).to.equal(3);
+    });
+
+    it('gets points cost from last token', () => {
+        const oneHundredPoints = 'Guy [1] 6+ 2+ Hero - 100pts';
+        expect(parser.parseUnit(oneHundredPoints).points).to.equal(100);
+
+        const twoHundredPoints = 'Guy [1] 6+ 2+ Hero - 200pts';
+        expect(parser.parseUnit(twoHundredPoints).points).to.equal(200);
+    });
+
+    it('gets available upgrades by working backwards from points until it hits a rule', () => {
+        const noUpgrades = 'Guy [1] 6+ 2+ Hero - 100pts';
+        expect(parser.parseUnit(noUpgrades).upgrades).to.deep.equal([]);
+
+        const oneUpgrade = 'Guy [1] 6+ 2+ Hero A 100pts';
+        expect(parser.parseUnit(oneUpgrade).upgrades).to.deep.equal(['A']);
+
+        const twoUpgrade = 'Guy [1] 6+ 2+ Hero A, B 100pts';
+        expect(parser.parseUnit(twoUpgrade).upgrades).to.deep.equal(['A', 'B']);
+    });
+
+    it.only('gets works backwards to get rule names', () => {
+        const oneRule = 'Guy [1] 6+ 2+ Hero - 100pts';
+        expect(parser.parseUnit(oneRule).rules).to.deep.equal(['Hero']);
+
+        const twoRules = 'Guy [1] 6+ 2+ Fearless Hero A 100pts';
+        expect(parser.parseUnit(twoRules).rules).to.deep.equal(['Fearless', 'Hero']);
+
+        const rulesWithX = 'Guy [1] 6+ 2+ Fearless, Slow, Tough(6) A, B 100pts';
+        expect(parser.parseUnit(rulesWithX).rules).to.deep.equal(['Fearless', 'Slow', 'Tough(6)']);
+    });
+
+    //TODO: parse the (X) values into the properties on the units
 });
 
 //TODO: another module that turns all of these data structures into output. It would wrap e.g. units in the
@@ -629,7 +718,7 @@ describe('Tokenizing lists by splitting on ",", but not inside ()', () => {
     });
 });
 
-describe('Parsing blocks of upgrade text', () => {
+describe.skip('Parsing blocks of upgrade text', () => {
 
     const simpleUpgradeText = `
 A
