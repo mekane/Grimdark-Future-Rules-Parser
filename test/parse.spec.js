@@ -17,33 +17,33 @@ describe('Parsing unit definitions', () => {
 describe('Parsing the upgrade group headers', () => {
     describe(`Detecting limits and properties from the second word`, () => {
         it(`limits the upgrade to a single use if the second word is "one"`, () => {
-            const replaceOne = parser.parseGroup('Replace one');
+            const replaceOne = parser.parseUpgradeGroup('Replace one');
             expect(replaceOne.limit).to.equal(1);
 
-            const takeOne = parser.parseGroup('Take one');
+            const takeOne = parser.parseUpgradeGroup('Take one');
             //expect(takeOne.limit).to.equal(1);
 
-            const upgradeOne = parser.parseGroup('Upgrade one');
+            const upgradeOne = parser.parseUpgradeGroup('Upgrade one');
             //expect(upgradeOne.limit).to.equal(1);
         });
 
         it(`sets the limit to one for "Replace all"`, () => {
-            const replaceAll = parser.parseGroup('Replace all');
+            const replaceAll = parser.parseUpgradeGroup('Replace all');
             expect(replaceAll.limit).to.equal(1);
         });
 
         it(`sets the limit to X for "up to X"`, () => {
-            const replaceUpToTwo = parser.parseGroup('Replace up to three');
+            const replaceUpToTwo = parser.parseUpgradeGroup('Replace up to three');
             expect(replaceUpToTwo.limit).to.equal(3);
         });
 
         it(`sets the limit to one for "Upgrade one model with:"`, () => {
-            const upgradeWith = parser.parseGroup("Upgrade one model with:");
+            const upgradeWith = parser.parseUpgradeGroup("Upgrade one model with:");
             expect(upgradeWith.limit).to.equal(1);
         });
 
         it(`sets the limit to one for "Upgrade with:"`, () => {
-            const upgradeWith = parser.parseGroup('Upgrade with:');
+            const upgradeWith = parser.parseUpgradeGroup('Upgrade with:');
             expect(upgradeWith.limit).to.equal(1);
         });
 
@@ -51,7 +51,7 @@ describe('Parsing the upgrade group headers', () => {
             //Note: I think an upgrade with this header and multiple options should not have an upgrade-level limit
             //since you could add each option. But each option should only be able to be added once (right?). How to
             //enforce that case?
-            const upgradeWith = parser.parseGroup('Upgrade all models with any:');
+            const upgradeWith = parser.parseUpgradeGroup('Upgrade all models with any:');
             expect(upgradeWith.limit).to.be.an('undefined');
         });
     });
@@ -60,7 +60,7 @@ describe('Parsing the upgrade group headers', () => {
 describe('Parsing "Replace" upgrade headers', () => {
     describe('Parsing "Replace all/any" with one, two, or three weapons', () => {
         it(`correctly parses replacement of one item, no spaces`, () => {
-            const replace = parser.parseGroup('Replace CCW:');
+            const replace = parser.parseUpgradeGroup('Replace CCW:');
             const expected = {
                 limit: 1,
                 replace: ['CCW']
@@ -69,7 +69,7 @@ describe('Parsing "Replace" upgrade headers', () => {
         });
 
         it(`correctly parses replacement of one item, with spaces`, () => {
-            const replace = parser.parseGroup('Replace Assault Rifle:');
+            const replace = parser.parseUpgradeGroup('Replace Assault Rifle:');
             const expected = {
                 limit: 1,
                 replace: ['Assault Rifle']
@@ -78,7 +78,7 @@ describe('Parsing "Replace" upgrade headers', () => {
         });
 
         it(`correctly parses replacement of two items, no spaces`, () => {
-            let replace = parser.parseGroup('Replace Gun and CCW:');
+            let replace = parser.parseUpgradeGroup('Replace Gun and CCW:');
             const expected = {
                 limit: 1,
                 replace: ['Gun', 'CCW']
@@ -87,7 +87,7 @@ describe('Parsing "Replace" upgrade headers', () => {
         });
 
         it(`correctly parses replacement of two items, first one with spaces`, () => {
-            const replace = parser.parseGroup('Replace Assault Rifle and CCW:');
+            const replace = parser.parseUpgradeGroup('Replace Assault Rifle and CCW:');
             const expected = {
                 limit: 1,
                 replace: ['Assault Rifle', 'CCW']
@@ -97,7 +97,7 @@ describe('Parsing "Replace" upgrade headers', () => {
 
         it(`correctly parses replacement of two items, both with spaces`, () => {
 
-            const replace = parser.parseGroup('Replace Assault Rifle and Storm Shield:');
+            const replace = parser.parseUpgradeGroup('Replace Assault Rifle and Storm Shield:');
             const expected = {
                 limit: 1,
                 replace: ['Assault Rifle', 'Storm Shield']
@@ -106,7 +106,7 @@ describe('Parsing "Replace" upgrade headers', () => {
         });
 
         it(`correctly parses replacement of two items, second one with spaces`, () => {
-            const replace = parser.parseGroup('Replace Gun and Storm Shield:');
+            const replace = parser.parseUpgradeGroup('Replace Gun and Storm Shield:');
             const expected = {
                 limit: 1,
                 replace: ['Gun', 'Storm Shield']
@@ -115,7 +115,7 @@ describe('Parsing "Replace" upgrade headers', () => {
         });
 
         it(`correctly parses replacement of three items, no spaces`, () => {
-            const replace = parser.parseGroup('Replace Gun, Sword and Shield:');
+            const replace = parser.parseUpgradeGroup('Replace Gun, Sword and Shield:');
             const expected = {
                 limit: 1,
                 replace: ['Gun', 'Sword', 'Shield']
@@ -124,7 +124,7 @@ describe('Parsing "Replace" upgrade headers', () => {
         });
 
         it(`correctly parses replacement of three items, first spaces`, () => {
-            const replace = parser.parseGroup('Replace Assault Rifle, Sword, and Shield:');
+            const replace = parser.parseUpgradeGroup('Replace Assault Rifle, Sword, and Shield:');
             const expected = {
                 limit: 1,
                 replace: ['Assault Rifle', 'Sword', 'Shield']
@@ -133,7 +133,7 @@ describe('Parsing "Replace" upgrade headers', () => {
         });
 
         it(`correctly parses replacement of three items, first two spaces`, () => {
-            const replace = parser.parseGroup('Replace Gun, Power Sword, and Shield:');
+            const replace = parser.parseUpgradeGroup('Replace Gun, Power Sword, and Shield:');
             const expected = {
                 limit: 1,
                 replace: ['Gun', 'Power Sword', 'Shield']
@@ -142,7 +142,7 @@ describe('Parsing "Replace" upgrade headers', () => {
         });
 
         it(`correctly parses replacement of three items, second two spaces`, () => {
-            const replace = parser.parseGroup('Replace Gun, Sword, and Storm Shield:');
+            const replace = parser.parseUpgradeGroup('Replace Gun, Sword, and Storm Shield:');
             const expected = {
                 limit: 1,
                 replace: ['Gun', 'Sword', 'Storm Shield']
@@ -151,7 +151,7 @@ describe('Parsing "Replace" upgrade headers', () => {
         });
 
         it(`correctly parses replacement of three items, outer two spaces`, () => {
-            const replace = parser.parseGroup('Replace Assault Rifle, Sword, and Storm Shield:');
+            const replace = parser.parseUpgradeGroup('Replace Assault Rifle, Sword, and Storm Shield:');
             const expected = {
                 limit: 1,
                 replace: ['Assault Rifle', 'Sword', 'Storm Shield']
@@ -160,7 +160,7 @@ describe('Parsing "Replace" upgrade headers', () => {
         });
 
         it(`correctly parses replacement of three items, all three spaces`, () => {
-            const replace = parser.parseGroup('Replace Assault Rifle, Power Sword, and Storm Shield:');
+            const replace = parser.parseUpgradeGroup('Replace Assault Rifle, Power Sword, and Storm Shield:');
             const expected = {
                 limit: 1,
                 replace: ['Assault Rifle', 'Power Sword', 'Storm Shield']
@@ -177,7 +177,7 @@ describe('Parsing "Replace" upgrade headers', () => {
             limit: 'models',
             replace: ['Razor Claws']
         };
-        expect(parser.parseGroup(string)).to.deep.equal(expected);
+        expect(parser.parseUpgradeGroup(string)).to.deep.equal(expected);
     });
 
     it('Correctly parses "Replace all Storm Rifles and Energy Fists:"', () => {
@@ -186,7 +186,7 @@ describe('Parsing "Replace" upgrade headers', () => {
             limit: 1,
             replaceAll: ['Storm Rifle', 'Energy Fist']
         };
-        expect(parser.parseGroup(string)).to.deep.equal(expected);
+        expect(parser.parseUpgradeGroup(string)).to.deep.equal(expected);
     });
 
     it('Correctly parses "Replace any Assault Rifle and CCW:"', () => {
@@ -194,7 +194,7 @@ describe('Parsing "Replace" upgrade headers', () => {
         const expected = {
             replace: ['Assault Rifle', 'CCW']
         };
-        expect(parser.parseGroup(string)).to.deep.equal(expected);
+        expect(parser.parseUpgradeGroup(string)).to.deep.equal(expected);
     });
 
     it('Correctly parses "Replace any Razor Claws:"', () => {
@@ -202,7 +202,7 @@ describe('Parsing "Replace" upgrade headers', () => {
         const expected = {
             replace: ['Razor Claws']
         };
-        expect(parser.parseGroup(string)).to.deep.equal(expected);
+        expect(parser.parseUpgradeGroup(string)).to.deep.equal(expected);
     });
 
     it('Correctly parses "Replace one AR and CCW:"', () => {
@@ -211,7 +211,7 @@ describe('Parsing "Replace" upgrade headers', () => {
             limit: 1,
             replace: ['AR', 'CCW']
         };
-        expect(parser.parseGroup(string)).to.deep.equal(expected);
+        expect(parser.parseUpgradeGroup(string)).to.deep.equal(expected);
     });
 
     it('Correctly parses "Replace one CCW:"', () => {
@@ -220,7 +220,7 @@ describe('Parsing "Replace" upgrade headers', () => {
             limit: 1,
             replace: ['CCW']
         };
-        expect(parser.parseGroup(string)).to.deep.equal(expected);
+        expect(parser.parseUpgradeGroup(string)).to.deep.equal(expected);
     });
 
     it('Correctly parses "Replace one Pistol:"', () => {
@@ -229,7 +229,7 @@ describe('Parsing "Replace" upgrade headers', () => {
             limit: 1,
             replace: ['Pistol']
         };
-        expect(parser.parseGroup(string)).to.deep.equal(expected);
+        expect(parser.parseUpgradeGroup(string)).to.deep.equal(expected);
     });
 
     it('Correctly parses "Replace Pistol:"', () => {
@@ -238,7 +238,7 @@ describe('Parsing "Replace" upgrade headers', () => {
             limit: 1,
             replace: ['Pistol']
         };
-        expect(parser.parseGroup(string)).to.deep.equal(expected);
+        expect(parser.parseUpgradeGroup(string)).to.deep.equal(expected);
     });
 
     it('Correctly parses "Replace Assault Rifle:"', () => {
@@ -247,7 +247,7 @@ describe('Parsing "Replace" upgrade headers', () => {
             limit: 1,
             replace: ['Assault Rifle']
         };
-        expect(parser.parseGroup(string)).to.deep.equal(expected);
+        expect(parser.parseUpgradeGroup(string)).to.deep.equal(expected);
     });
 
     it('Correctly parses "Replace up to two Pistols:"', () => {
@@ -256,7 +256,7 @@ describe('Parsing "Replace" upgrade headers', () => {
             limit: 2,
             replace: ['Pistol']
         };
-        expect(parser.parseGroup(string)).to.deep.equal(expected);
+        expect(parser.parseUpgradeGroup(string)).to.deep.equal(expected);
     });
 
     it('Correctly parses "Replace Walker Fist and Storm Rifle:"', () => {
@@ -265,7 +265,7 @@ describe('Parsing "Replace" upgrade headers', () => {
             limit: 1,
             replace: ['Walker Fist', 'Storm Rifle']
         };
-        expect(parser.parseGroup(string)).to.deep.equal(expected);
+        expect(parser.parseUpgradeGroup(string)).to.deep.equal(expected);
     });
 
     it('Correctly parses "Replace Frost Cannon, Walker Fist and Storm Rifle:"', () => {
@@ -274,7 +274,7 @@ describe('Parsing "Replace" upgrade headers', () => {
             limit: 1,
             replace: ['Frost Cannon', 'Walker Fist', 'Storm Rifle']
         };
-        expect(parser.parseGroup(string)).to.deep.equal(expected);
+        expect(parser.parseUpgradeGroup(string)).to.deep.equal(expected);
     });
 });
 
@@ -285,7 +285,7 @@ describe('Parsing "Take" upgrade headers', () => {
             limit: 'models with Energy Fist', //Will need to be implemented in the upgrade function
             require: ['Energy Fist']
         };
-        expect(parser.parseGroup(string)).to.deep.equal(expected);
+        expect(parser.parseUpgradeGroup(string)).to.deep.equal(expected);
     });
 
     it('Correctly parses "Take one Assault Rifle Attachment:"', () => {
@@ -294,7 +294,7 @@ describe('Parsing "Take" upgrade headers', () => {
             limit: 1,
             require: ['Assault Rifle']
         };
-        expect(parser.parseGroup(string)).to.deep.equal(expected);
+        expect(parser.parseUpgradeGroup(string)).to.deep.equal(expected);
     });
     //TODO: more cases for "Take":
     //   * multiple items (and)
@@ -307,49 +307,49 @@ describe('Parsing "Upgrade" upgrade headers', () => {
         const expected = {
             limit: 1
         };
-        expect(parser.parseGroup(string)).to.deep.equal(expected);
+        expect(parser.parseUpgradeGroup(string)).to.deep.equal(expected);
     });
 
     it.skip('Correctly parses "Upgrade all models with any:"', () => {
         const string = "Upgrade all models with any:";
         const expected = {};
-        expect(parser.parseGroup(string)).to.deep.equal(expected);
+        expect(parser.parseUpgradeGroup(string)).to.deep.equal(expected);
     });
 
     it.skip('Correctly parses "Upgrade any model with:"', () => {
         const string = "Upgrade any model with:";
         const expected = {};
-        expect(parser.parseGroup(string)).to.deep.equal(expected);
+        expect(parser.parseUpgradeGroup(string)).to.deep.equal(expected);
     });
 
     it.skip('Correctly parses "Upgrade one model with:"', () => {
         const string = "Upgrade one model with:";
         const expected = {};
-        expect(parser.parseGroup(string)).to.deep.equal(expected);
+        expect(parser.parseUpgradeGroup(string)).to.deep.equal(expected);
     });
 
     it.skip('Correctly parses "Upgrade one model with one:"', () => {
         const string = "Upgrade one model with one:";
         const expected = {};
-        expect(parser.parseGroup(string)).to.deep.equal(expected);
+        expect(parser.parseUpgradeGroup(string)).to.deep.equal(expected);
     });
 
     it.skip('Correctly parses "Upgrade up to two models with one:"', () => {
         const string = "Upgrade up to two models with one:";
         const expected = {};
-        expect(parser.parseGroup(string)).to.deep.equal(expected);
+        expect(parser.parseUpgradeGroup(string)).to.deep.equal(expected);
     });
 
     it.skip('Correctly parses "Upgrade with:"', () => {
         const string = "Upgrade with:";
         const expected = {};
-        expect(parser.parseGroup(string)).to.deep.equal(expected);
+        expect(parser.parseUpgradeGroup(string)).to.deep.equal(expected);
     });
 
     it.skip('Correctly parses "Upgrade with one:"', () => {
         const string = "Upgrade with one:";
         const expected = {};
-        expect(parser.parseGroup(string)).to.deep.equal(expected);
+        expect(parser.parseUpgradeGroup(string)).to.deep.equal(expected);
     });
 
     it.skip('Correctly parses "Upgrade Psychic(1):"', () => {
@@ -360,7 +360,7 @@ describe('Parsing "Upgrade" upgrade headers', () => {
                 'psychic': 1
             }
         };
-        expect(parser.parseGroup(string)).to.deep.equal(expected);
+        expect(parser.parseUpgradeGroup(string)).to.deep.equal(expected);
     });
 });
 
@@ -638,27 +638,24 @@ Pistol (12”, A1) and CCW (A2) +5pts
 `;
 
     it('parses a simple block', () => {
-        const actual = parser.parseText(simpleUpgradeText);
+        const actual = parser.parseUpgradeSection(simpleUpgradeText);
 
         const expected = {
-             A: {
-                 '1': {
-                     description: 'Replace one',
-                     limit: 1,
-                     upgrades: [
-                         {
-                             name: 'Pistol',
-                             weapons: [
-                                 {
+            A: {
+                '1': {
+                    description: 'Replace one',
+                    limit: 1,
+                    upgrades: [{
+                        name: 'Pistol',
+                        weapons: [{
 
-                                 },
-                                 {}
-                             ],
-                             cost: 5
-                         }
-                     ]
-                 }
-             }
+                            },
+                            {}
+                        ],
+                        cost: 5
+                    }]
+                }
+            }
         };
 
         expect(actual).to.deep.equal(expected);
@@ -690,7 +687,7 @@ Upgrade with:
 `;
 
     it('parses a more complex block', () => {
-        const actual = parser.parseText(upgradeTextBlock);
+        const actual = parser.parseUpgradeSection(upgradeTextBlock);
 
         const expectedUpgradeGroupKeys = ['description', 'max', 'upgrades'];
 
@@ -718,4 +715,3 @@ Upgrade with:
         expect(actual).to();
     });
 });
-

@@ -30,11 +30,11 @@ const replaceThreeRegex = /(?:[Rr]eplace) (all |any |one )?(\w+ ?\w+), (\w+ ?\w+
 
 const ruleWithValueRegex = /^(\w+)\((\+?\d+)\)$/;
 
-function parseText(rulesText) {
+function parseUpgradeSection(rulesText) {
 
 }
 
-function parseGroup(upgradeText) {
+function parseUpgradeGroup(upgradeText) {
     let stringToParse = stripTrailingCharacter(upgradeText, ':');
 
     const upgradeSpec = {};
@@ -300,8 +300,8 @@ function splitByCommas(textToTokenize) {
 }
 
 module.exports = {
-    parseGroup,
-    parseText,
+    parseUpgradeGroup,
+    parseUpgradeSection,
     parseUpgrade,
     splitByCommas
 };
