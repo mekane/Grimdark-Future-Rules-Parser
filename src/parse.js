@@ -384,13 +384,23 @@ function parseUnit(stringToParse) {
         lastToken = token[token.length - 1];
     }
 
+    const remainingText = token.join(' ');
+    const weaponTokens = splitByCommas(remainingText);
+
+    const equipment = [];
+    weaponTokens.forEach(weaponText => {
+        const pattern = weaponText.match(weaponSpec);
+        const weapon = weaponObjectFromRegexMatch(pattern);
+        equipment.push(weapon);
+    });
+
     return {
         name: name.trim(),
         models,
         quality,
         defense,
-        equipment: [],
-        rules: rules,
+        equipment,
+        rules,
         upgrades,
         points
     }

@@ -6,8 +6,8 @@ const parser = require('../src/parse');
 //it auto-generates group letters(?)
 //it auto-numbers the items 1,2,3
 
-describe.only('Parsing unit definitions', () => {
-    it('handles malformed string gracefully', () => {
+describe('Parsing unit definitions', () => {
+    it.skip('handles malformed string gracefully', () => {
         '';
         'Dude';
         'Name [';
@@ -86,7 +86,7 @@ describe.only('Parsing unit definitions', () => {
         expect(parser.parseUnit(twoUpgrade).upgrades).to.deep.equal(['A', 'B']);
     });
 
-    it.only('gets works backwards to get rule names', () => {
+    it('gets works backwards to get rule names', () => {
         const oneRule = 'Guy [1] 6+ 2+ Hero - 100pts';
         expect(parser.parseUnit(oneRule).rules).to.deep.equal(['Hero']);
 
@@ -97,7 +97,41 @@ describe.only('Parsing unit definitions', () => {
         expect(parser.parseUnit(rulesWithX).rules).to.deep.equal(['Fearless', 'Slow', 'Tough(6)']);
     });
 
-    //TODO: parse the (X) values into the properties on the units
+    it('parses the (X) values into the properties on the units');
+
+    it('parses a weapon definition from the remaining tokens', () => {
+        const grunt = "Grunt [1] 5+ 6+ Rifle (24”, A1) Slow A, B 20pts";
+        const parsedGrunt = parser.parseUnit(grunt);
+
+        expect(parsedGrunt).to.deep.equal({
+            name: 'Grunt',
+            models: 1,
+            quality: 5,
+            defense: 6,
+            equipment: [
+                { name: 'Rifle', range: 24, attacks: 1, rules: [] }
+            ],
+            rules: ['Slow'],
+            upgrades: ['A', 'B'],
+            points: 20
+        });
+
+        const captain = "Captain [1] 3+ 2+ Assault Rifle (24”, A2), CCW (A1, Rending) Hero, Tough(3) A, B, C 110pts";
+        const parsedCaptain = parser.parseUnit(captain);
+        expect(parsedCaptain).to.deep.equal({
+            name: 'Captain',
+            models: 1,
+            quality: 3,
+            defense: 2,
+            equipment: [
+                { name: 'Assault Rifle', range: 24, attacks: 2, rules: [] },
+                { name: 'CCW', range: 'melee', attacks: 1, rules: ['Rending'] }
+            ],
+            rules: ['Hero', 'Tough(3)'],
+            upgrades: ['A', 'B', 'C'],
+            points: 110
+        });
+    });
 });
 
 //TODO: another module that turns all of these data structures into output. It would wrap e.g. units in the
