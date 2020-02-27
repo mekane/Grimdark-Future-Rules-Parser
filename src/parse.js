@@ -327,6 +327,10 @@ Captain [1] 3+ 2+ Assault Rifle (24”, A1), CCW (A1) Fearless, Hero, Relentless
 */
 
 function parseUnit(stringToParse) {
+    if (typeof stringToParse !== 'string' || stringToParse.length < 1) {
+        throw new Error('missing unit name');
+    }
+
     const token = stringToParse.split(' ');
 
     let name = '';
@@ -338,20 +342,33 @@ function parseUnit(stringToParse) {
     }
 
     if (token.length < 1) {
-        throw new Error('Missing model count after unit name');
+        throw new Error('missing model count after unit name');
     }
 
     //assume the next token is [integer], and parse it
     const textBetweenBrackets = token[0].slice(1, -1);
     const models = parseInt(textBetweenBrackets, 10);
+
+    if (isNaN(models)) {
+        throw new Error(`invalid number of models (${textBetweenBrackets})`);
+    }
+
     token.shift();
 
     //assume quality looks like n+
     const quality = parseInt(token[0], 10);
+    if (isNaN(quality)) {
+        throw new Error(`invalid quality (${token[0]})`);
+    }
+
     token.shift();
 
     //assume defense looks like n+
     const defense = parseInt(token[0], 10);
+    if (isNaN(defense)) {
+        throw new Error(`invalid defense (${token[0]})`);
+    }
+
     token.shift();
 
     //work backwards to get points
@@ -359,10 +376,20 @@ function parseUnit(stringToParse) {
     //assume points string ends with pts
     const pointsString = lastToken.slice(0, -3);
     const points = parseInt(pointsString, 10);
+    if (isNaN(points)) {
+        throw new Error(`invalid points (${pointsString})`);
+    }
+
+
     token.pop();
 
     //work backwards to get upgrades until we see a rule
     lastToken = token[token.length - 1];
+
+    if (!lastToken) {
+        throw new Error("this error")
+    }
+
     const upgrades = [];
     while (lastToken.length && !isRuleName(lastToken)) {
         let rule = token.pop();

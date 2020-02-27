@@ -7,16 +7,42 @@ const parser = require('../src/parse');
 //it auto-numbers the items 1,2,3
 
 describe('Parsing unit definitions', () => {
-    it.skip('handles malformed string gracefully', () => {
-        '';
-        'Dude';
-        'Name [';
-        'Name [2';
-        'Name [x]';
-        'Name [1]';
-        'Name [1] q+';
+    it('handles malformed string gracefully', () => {
+        function emptyString() { parser.parseUnit('') }
+        expect(emptyString).to.throw(/missing unit name/);
 
-        // TODO: show an error message, as friendly and helpful as possible
+        function missingModels() { parser.parseUnit('Name') }
+        expect(missingModels).to.throw(/missing model count/);
+
+        function missingModelCount() { parser.parseUnit('Name [') }
+        expect(missingModelCount).to.throw(/invalid number of models/);
+
+        function missingModelEndBracket() { parser.parseUnit('Name [2') }
+        expect(missingModelEndBracket).to.throw(/invalid number of models/);
+
+        function invalidModelCount() { parser.parseUnit('Name [x]') }
+        expect(invalidModelCount).to.throw(/invalid number of models/);
+
+        function missingQuality() { parser.parseUnit('Name [1]') }
+        expect(missingQuality).to.throw(/invalid quality/);
+
+        function invalidQuality() { parser.parseUnit('Name [1] q+') }
+        expect(invalidQuality).to.throw(/invalid quality/);
+
+        function missingDefense() { parser.parseUnit('Name [1] 2+') }
+        expect(missingDefense).to.throw(/invalid defense/);
+
+        function invalidDefense() { parser.parseUnit('Name [1] 2+ d+') }
+        expect(invalidDefense).to.throw(/invalid defense/);
+
+        function missingPoints() { parser.parseUnit('Name [1] 2+ 2+ Hero -') }
+        expect(missingPoints).to.throw(/invalid points/);
+
+        function missingRules() { parser.parseUnit('Name [1] 2+ 2+ - 10pts') }
+        expect(missingRules).to.throw(/invalid rules/);
+
+        function invalidWeapons() { parser.parseUnit('Name [1] 2+ 2+ Garbage Hero - 10pts') }
+        expect(invalidWeapons).to.throw(/invalid weapons/);
     });
 
     it('returns a data structure with basic unit properties', () => {
