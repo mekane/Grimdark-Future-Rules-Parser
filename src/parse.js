@@ -380,18 +380,13 @@ function parseUnit(stringToParse) {
         throw new Error(`invalid points (${pointsString})`);
     }
 
-
     token.pop();
 
     //work backwards to get upgrades until we see a rule
     lastToken = token[token.length - 1];
 
-    if (!lastToken) {
-        throw new Error("this error")
-    }
-
     const upgrades = [];
-    while (lastToken.length && !isRuleName(lastToken)) {
+    while (!!lastToken && !isRuleName(lastToken)) {
         let rule = token.pop();
         if (rule !== '-') {
             if (rule.endsWith(',')) {
@@ -421,6 +416,11 @@ function parseUnit(stringToParse) {
     const equipment = [];
     weaponTokens.forEach(weaponText => {
         const pattern = weaponText.match(weaponSpec);
+
+        if (pattern === null) {
+            throw new Error('invalid weapons (' + weaponText + ')')
+        }
+
         const weapon = weaponObjectFromRegexMatch(pattern);
         equipment.push(weapon);
     });

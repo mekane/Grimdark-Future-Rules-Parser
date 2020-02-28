@@ -38,9 +38,6 @@ describe('Parsing unit definitions', () => {
         function missingPoints() { parser.parseUnit('Name [1] 2+ 2+ Hero -') }
         expect(missingPoints).to.throw(/invalid points/);
 
-        function missingRules() { parser.parseUnit('Name [1] 2+ 2+ - 10pts') }
-        expect(missingRules).to.throw(/invalid rules/);
-
         function invalidWeapons() { parser.parseUnit('Name [1] 2+ 2+ Garbage Hero - 10pts') }
         expect(invalidWeapons).to.throw(/invalid weapons/);
     });
