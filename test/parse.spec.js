@@ -119,10 +119,17 @@ describe('Parsing unit definitions', () => {
         expect(parser.parseUnit(twoRules).rules).to.deep.equal(['Fearless', 'Hero']);
 
         const rulesWithX = 'Guy [1] 6+ 2+ Fearless, Slow, Tough(6) A, B 100pts';
-        expect(parser.parseUnit(rulesWithX).rules).to.deep.equal(['Fearless', 'Slow', 'Tough(6)']);
+        expect(parser.parseUnit(rulesWithX).rules).to.deep.equal(['Fearless', 'Slow', 'Tough']);
     });
 
-    it('parses the (X) values into the properties on the units');
+    it('parses the (X) values into the properties on the units', () => {
+        const rulesWithX = 'Guy [1] 6+ 2+ Fearless, Slow, Tough(6) A, B 100pts';
+        const parsedUnit = parser.parseUnit(rulesWithX);
+
+        expect(parsedUnit.rules).to.deep.equal(['Fearless', 'Slow', 'Tough']);
+        expect(parsedUnit.tough).to.equal(6);
+
+    });
 
     it('parses a weapon definition from the remaining tokens', () => {
         const grunt = "Grunt [1] 5+ 6+ Rifle (24”, A1) Slow A, B 20pts";
@@ -152,7 +159,8 @@ describe('Parsing unit definitions', () => {
                 { name: 'Assault Rifle', range: 24, attacks: 2, rules: [] },
                 { name: 'CCW', range: 'melee', attacks: 1, rules: ['Rending'] }
             ],
-            rules: ['Hero', 'Tough(3)'],
+            rules: ['Hero', 'Tough'],
+            tough: 3,
             upgrades: ['A', 'B', 'C'],
             points: 110
         });

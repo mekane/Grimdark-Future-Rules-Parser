@@ -425,16 +425,20 @@ function parseUnit(stringToParse) {
         equipment.push(weapon);
     });
 
-    return {
+    const unit = {
         name: name.trim(),
         models,
         quality,
         defense,
         equipment,
-        rules,
+        rules: [],
         upgrades,
         points
     };
+
+    extractRulesWithValues(unit, rules);
+
+    return unit;
 }
 
 function isRuleName(text) {
